@@ -1,11 +1,10 @@
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
+from pathlib import Path
 
 
 class KidsShopHandler(SimpleHTTPRequestHandler):
-    def translate_path(self, path):
-        if path.startswith("/images/"):
-            path = "/public" + path
-        return super().translate_path(path)
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, directory=str(Path(__file__).parent / "public"), **kwargs)
 
 
 if __name__ == "__main__":

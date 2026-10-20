@@ -13,8 +13,8 @@ Uzbek/Russian children’s clothing storefront prepared for Vercel. The static s
 
 ## Run locally
 
-1. From this folder, run `python -m http.server 4173` in PowerShell.
-2. Open [http://localhost:4173](http://localhost:4173).
+1. From this folder, run `py -3 local_server.py` in PowerShell (or double-click `start-local.bat`).
+2. Open [http://127.0.0.1:4173](http://127.0.0.1:4173).
 3. Product browsing, language switching, favorites, cart, and checkout preview work locally. Local demo orders are saved in this browser only (`localStorage` key `kids-shop-local-orders`) and are not sent to Telegram or stored as real orders. Stop the server with `Ctrl+C`.
 4. Real order submission requires the Vercel functions plus configured Supabase and Telegram credentials. For now, checkout only offers cash on delivery; the online payment options were removed.
 
@@ -30,4 +30,4 @@ Three reference images provided in the task are copied into `public/images/`. Th
 - A customer sign-in method. Phone OTP needs an SMS provider; email magic links need a verified email sender. Favorites currently stay in the current browser, and the account/order-history UI is not wired until the sign-in provider is chosen.
 - The final Mini App bot username and Telegram group/operator chat IDs.
 
-The included UI design-system search helper described in the supplied UI/UX skill was not present in the skill folder, so the storefront was built directly from the skill’s accessibility, mobile-layout, interaction, contrast, and motion guidance plus the supplied image references.
+The static storefront files live in `public/`; `vercel.json` explicitly sets this as the output directory so Vercel serves `public/index.html`.
