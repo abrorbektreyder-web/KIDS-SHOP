@@ -45,5 +45,5 @@ persist();setLanguage(state.lang);renderProducts();
 fetch("/api/products").then(r=>r.ok?r.json():Promise.reject()).then(data=>{if(Array.isArray(data.products)&&data.products.length){PRODUCTS.splice(0,PRODUCTS.length,...data.products);renderProducts();}}).catch(()=>{});
 
 function esc(value){return String(value??"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/\"/g,"&quot;").replace(/'/g,"&#39;");}
-function safeImage(value){const url=String(value||"");if(!/^\/images\/[A-Za-z0-9_-]+\.(?:webp|png|jpe?g)$/i.test(url))return "/images/look-safari.webp";const optimized=url.replace(/\/(kids-fashion-campaign|look-adventure|look-safari)\.png$/i,"/$1.webp");return optimized;}
+function safeImage(value){const url=String(value||"");if(/^\/images\/[A-Za-z0-9_-]+\.(?:webp|png|jpe?g)$/i.test(url)){return url.replace(/\/(kids-fashion-campaign|look-adventure|look-safari)\.png$/i,"/$1.webp");}if(/^https:\/\/[a-z0-9-]+\.supabase\.co\/storage\/v1\/object\/public\/product-images\/[a-f0-9-]+\.(?:webp|png|jpe?g)$/i.test(url))return url;return "/images/look-safari.webp";}
 function safeColor(value){return /^#[0-9a-f]{6}$/i.test(String(value))?value:"#e8e5db";}

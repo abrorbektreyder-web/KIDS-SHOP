@@ -111,6 +111,34 @@ module.exports = async function handler(req, res) {
   try {
     if (action === "products") return res.status(200).json({ products: await request("products?select=*&order=created_at.desc") });
     if (action === "orders") return res.status(200).json({ orders: await request("orders?select=*,order_items(*)&order=created_at.desc&limit=100") });
+    if (action === "uploadImage") {
+      const image = body.image || {};
+      const mimeTypes = { "image/webp": "webp", "image/jpeg": "jpg", "image/png": "png" };
+      const extension = mimeTypes[String(image.type || "")];
+      const encoded = String(image.data || "");
+      if (!extension || !/^[A-Za-z0-9+/]+={0,2}$/.test(encoded) || encoded.length > 3000000) {
+        return res.status(400).json({ error: "invalid_image" });
+      }
+      const bytes = Buffer.from(encoded, "base64");
+      if (!bytes.length || bytes.length > 2200000) return res.status(413).json({ error: "image_too_large" });
+
+      const storageHeaders = supabaseHeaders(key, { "Content-Type": "application/json" });
+      const bucketResponse = await fetch(new URL("/storage/v1/bucket", projectUrl), {
+        method: "POST",
+        headers: storageHeaders,
+        body: JSON.stringify({ id: "product-images", name: "product-images", public: true, file_size_limit: 2200000, allowed_mime_types: Object.keys(mimeTypes) }),
+      });
+      if (!bucketResponse.ok && bucketResponse.status !== 409) throw new Error("storage_bucket_unavailable");
+
+      const fileName = `${crypto.randomUUID()}.${extension}`;
+      const uploadResponse = await fetch(new URL(`/storage/v1/object/product-images/${fileName}`, projectUrl), {
+        method: "POST",
+        headers: supabaseHeaders(key, { "Content-Type": image.type, "Cache-Control": "public, max-age=31536000, immutable", "x-upsert": "false" }),
+        body: bytes,
+      });
+      if (!uploadResponse.ok) throw new Error("storage_upload_failed");
+      return res.status(201).json({ image_url: `${projectUrl.replace(/\/$/, "")}/storage/v1/object/public/product-images/${fileName}` });
+    }
     if (action === "saveProduct") {
       const p = body.product || {};
       const id = String(p.id || "").toLowerCase().replace(/[^a-z0-9-]/g, "").slice(0, 64);
@@ -121,7 +149,14 @@ module.exports = async function handler(req, res) {
       if (!id || !String(p.name_uz || "").trim() || !String(p.name_ru || "").trim() || !Number.isSafeInteger(price) || price < 0 || !Number.isSafeInteger(stock) || stock < 0 || (oldPrice !== null && (!Number.isSafeInteger(oldPrice) || oldPrice < price))) {
         return res.status(400).json({ error: "invalid_product" });
       }
-      if (!/^\/images\/[A-Za-z0-9_-]+\.(?:webp|png|jpe?g)$/i.test(image)) return res.status(400).json({ error: "invalid_product_image" });
+      const isLocalImage = /^\/images\/[A-Za-z0-9_-]+\.(?:webp|png|jpe?g)$/i.test(image);
+      let isStoredImage = false;
+      try {
+        const parsedImage = new URL(image);
+        const parsedProject = new URL(projectUrl);
+        isStoredImage = parsedImage.origin === parsedProject.origin && /^\/storage\/v1\/object\/public\/product-images\/[a-f0-9-]+\.(?:webp|png|jpe?g)$/i.test(parsedImage.pathname) && !parsedImage.search && !parsedImage.hash;
+      } catch {}
+      if (!isLocalImage && !isStoredImage) return res.status(400).json({ error: "invalid_product_image" });
       const row = {
         id,
         name_uz: String(p.name_uz).trim().slice(0, 140),
