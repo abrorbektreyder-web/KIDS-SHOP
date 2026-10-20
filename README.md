@@ -6,9 +6,9 @@ Uzbek/Russian children’s clothing storefront prepared for Vercel. The static s
 
 1. Connect this folder’s Git repository to Vercel. No build command or package installation is required; Vercel serves the static pages and runs `api/*.js` as serverless functions.
 2. Create a Supabase project. In its SQL editor, run [`supabase/schema.sql`](supabase/schema.sql) once. This creates the product catalog, inventory, orders, order lines, subscriber list, and the transactional `place_order` function. Sample names, prices, stock, and photos are placeholders; update them before taking real orders.
-3. Create a Telegram bot with BotFather, add it to the order group with permission to send messages, start the bot in a private chat with the operator, and configure the Mini App URL in BotFather.
+3. Create a Telegram bot with BotFather, add it as an administrator to the order group or channel with permission to send messages, and configure the Mini App URL in BotFather.
 4. Add the values in [`.env.example`](.env.example) under Vercel **Project Settings → Environment Variables**. `SUPABASE_SECRET_KEY`, `TELEGRAM_BOT_TOKEN`, `ADMIN_PASSWORD`, and `ADMIN_SESSION_SECRET` are server-only secrets. Never add them to `config.js` or commit real values. The API accepts the newer Supabase secret key and keeps a compatibility fallback for legacy `service_role` keys.
-5. Set `TELEGRAM_GROUP_ID` and `TELEGRAM_OPERATOR_ID` to the destination chat IDs. The order API writes the order and decrements stock inside one database transaction before it sends a report to both chats. Keep `ORDERS_ENABLED=false` until the real catalog and order destinations are ready; switch it to `true` to open checkout.
+5. Set `TELEGRAM_GROUP_ID` to the destination group or channel ID. The bot must be allowed to post there. The order API writes the order and decrements stock inside one database transaction before sending the report to that destination. Keep `ORDERS_ENABLED=false` until the catalog and destination are ready; switch it to `true` to open checkout.
 6. Set a long, unique `ADMIN_PASSWORD` and a randomly generated `ADMIN_SESSION_SECRET` with at least 32 characters. Open `/admin/` to manage products, stock, order status, and call the customer.
 
 ## Run locally

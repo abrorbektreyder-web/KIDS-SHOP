@@ -14,10 +14,10 @@ function verifyTelegramInitData(initData,botToken){
 module.exports=async function handler(req,res){
   if(req.method!=="POST"){res.setHeader("Allow","POST");return res.status(405).json({error:"method_not_allowed"});}
   const {url,key}=getSupabaseConfig();
-  const {TELEGRAM_BOT_TOKEN,TELEGRAM_GROUP_ID,TELEGRAM_OPERATOR_ID,ORDERS_ENABLED}=process.env;
+  const {TELEGRAM_BOT_TOKEN,TELEGRAM_GROUP_ID,ORDERS_ENABLED}=process.env;
   if(ORDERS_ENABLED!=="true")return res.status(503).json({error:"orders_not_open"});
   if(!url||!key)return res.status(503).json({error:"database_not_configured"});
-  if(!TELEGRAM_BOT_TOKEN||!TELEGRAM_GROUP_ID||!TELEGRAM_OPERATOR_ID)return res.status(503).json({error:"telegram_not_configured"});
+  if(!TELEGRAM_BOT_TOKEN||!TELEGRAM_GROUP_ID)return res.status(503).json({error:"telegram_not_configured"});
   const body=req.body||{};const c=body.customer||{};const items=Array.isArray(body.items)?body.items:[];
   const phone=String(c.phone||"").replace(/[^+\d]/g,"");
   if(String(c.name||"").trim().length<2||phone.replace(/\D/g,"").length<9||String(c.address||"").trim().length<5||!c.region||!c.district||!items.length||items.length>20)return res.status(400).json({error:"invalid_order"});
@@ -32,8 +32,8 @@ module.exports=async function handler(req,res){
     const tgItems=(order.items||[]).map(i=>`• ${escapeHtml(i.name)} — ${escapeHtml(i.size)} × ${i.qty}: ${Number(i.unitPrice*i.qty||0).toLocaleString("ru-RU")} сум`).join("\n");
     const report=`🧸 <b>KIDS-SHOP · YANGI BUYURTMA</b>\n\n<b>№ ${escapeHtml(String(orderId).slice(0,8).toUpperCase())}</b>\n👤 ${escapeHtml(payload.customer.name)}\n📞 <a href="tel:${escapeHtml(phone)}">${escapeHtml(phone)}</a>\n📍 ${escapeHtml(payload.customer.region)}, ${escapeHtml(payload.customer.district)}\n🏠 ${escapeHtml(payload.customer.address)}\n💳 ${payload.payment==="cod"?"Yetkazilganda to‘lov":"Karta (operator tasdiqlasin)"}\n\n${tgItems}\n\n<b>Jami: ${total.toLocaleString("ru-RU")} so‘m</b>${payload.customer.comment?`\n\n💬 ${escapeHtml(payload.customer.comment)}`:""}`;
     const send=async chat_id=>{const r=await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({chat_id,text:report,parse_mode:"HTML",disable_web_page_preview:true})});if(!r.ok)throw new Error("telegram_delivery_failed");};
-    const delivery=await Promise.allSettled([send(TELEGRAM_GROUP_ID),send(TELEGRAM_OPERATOR_ID)]);
-    const notified=delivery.every(d=>d.status==="fulfilled");
+    const delivery=await Promise.allSettled([send(TELEGRAM_GROUP_ID)]);
+    const notified=delivery[0].status==="fulfilled";
     return res.status(201).json({orderId:String(orderId),total,notified});
   }catch(error){console.error("order_create_failed",error.message);return res.status(error.message==="order_save_failed"?500:400).json({error:"order_could_not_be_completed"});}
 };
