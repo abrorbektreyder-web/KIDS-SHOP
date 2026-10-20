@@ -8,15 +8,16 @@ const demo = [
   ["sunny-day-set","Sunny Day qulay set","Комплект Sunny Day","boys","sets",269000,319000,"2–7 yosh",["#f3d34d","#2c61d6","#ede9df"],"/images/look-adventure.png","−16%","Yumshoq paxta • faol bolalar uchun","Мягкий хлопок • для активных детей",["2–3 yosh","3–4 yosh","5–6 yosh","7–8 yosh"]],
   ["weekend-dress","Weekend mini libos","Платье Weekend mini","girls","tops",199000,null,"2–7 yosh",["#aabd84","#e2c9a0","#eeb7a5"],"/images/kids-fashion-campaign.png","HIT","Har bir kun — kichik bayram","Каждый день — маленький праздник",["2–3 yosh","3–4 yosh","5–6 yosh","7–8 yosh"]]
 ].map(([id,uz,ru,category,type,price,oldPrice,age,colors,image,badge,uzTag,ruTag,sizes])=>({id,name:{uz,ru},category,type,price,oldPrice,age,colors,image,badge,tagline:{uz:uzTag,ru:ruTag},sizes,stock:10}));
+const {getSupabaseConfig,supabaseHeaders}=require("./_supabase");
 
 module.exports = async function handler(req,res){
   res.setHeader("Cache-Control","s-maxage=60, stale-while-revalidate=300");
   if(req.method!=="GET"){res.setHeader("Allow","GET");return res.status(405).json({error:"method_not_allowed"});}
-  const {SUPABASE_URL,SUPABASE_SERVICE_ROLE_KEY}=process.env;
-  if(!SUPABASE_URL||!SUPABASE_SERVICE_ROLE_KEY)return res.status(200).json({products:demo,source:"demo"});
+  const {url,key}=getSupabaseConfig();
+  if(!url||!key)return res.status(200).json({products:demo,source:"demo"});
   try{
-    const url=new URL("/rest/v1/products?active=eq.true&select=*&order=created_at.desc",SUPABASE_URL);
-    const result=await fetch(url,{headers:{apikey:SUPABASE_SERVICE_ROLE_KEY,Authorization:`Bearer ${SUPABASE_SERVICE_ROLE_KEY}`} });
+    const endpoint=new URL("/rest/v1/products?active=eq.true&select=*&order=created_at.desc",url);
+    const result=await fetch(endpoint,{headers:supabaseHeaders(key)});
     if(!result.ok)throw new Error("catalog_unavailable");
     const rows=await result.json();
     const products=rows.map(p=>({id:p.id,name:{uz:p.name_uz,ru:p.name_ru},category:p.category,type:p.type,price:p.price,oldPrice:p.old_price,age:p.age,colors:p.colors,image:p.image_url,badge:p.badge,tagline:{uz:p.tagline_uz,ru:p.tagline_ru},sizes:p.sizes,stock:p.stock}));

@@ -1,4 +1,5 @@
 const crypto=require("node:crypto");
+const {getSupabaseConfig,supabaseHeaders}=require("./_supabase");
 const b64=value=>Buffer.from(value).toString("base64url");
 function tokenFor(secret){const payload=b64(JSON.stringify({exp:Date.now()+8*60*60*1000,scope:"admin"}));const sig=crypto.createHmac("sha256",secret).update(payload).digest("base64url");return `${payload}.${sig}`;}
 function validToken(token,secret){try{const [payload,sig]=String(token||"").split(".");if(!payload||!sig)return false;const expected=crypto.createHmac("sha256",secret).update(payload).digest();const actual=Buffer.from(sig,"base64url");if(expected.length!==actual.length||!crypto.timingSafeEqual(expected,actual))return false;const data=JSON.parse(Buffer.from(payload,"base64url").toString());return data.scope==="admin"&&data.exp>Date.now();}catch{return false;}}
@@ -6,12 +7,13 @@ function sameSecret(a,b){const x=Buffer.from(String(a||""));const y=Buffer.from(
 module.exports=async function handler(req,res){
   res.setHeader("Cache-Control","no-store");
   if(req.method!=="POST"){res.setHeader("Allow","POST");return res.status(405).json({error:"method_not_allowed"});}
-  const {SUPABASE_URL,SUPABASE_SERVICE_ROLE_KEY,ADMIN_PASSWORD,ADMIN_SESSION_SECRET}=process.env;
-  if(!SUPABASE_URL||!SUPABASE_SERVICE_ROLE_KEY||!ADMIN_PASSWORD||!ADMIN_SESSION_SECRET||ADMIN_SESSION_SECRET.length<32)return res.status(503).json({error:"admin_not_configured"});
+  const {url:projectUrl,key}=getSupabaseConfig();
+  const {ADMIN_PASSWORD,ADMIN_SESSION_SECRET}=process.env;
+  if(!projectUrl||!key||!ADMIN_PASSWORD||!ADMIN_SESSION_SECRET||ADMIN_SESSION_SECRET.length<32)return res.status(503).json({error:"admin_not_configured"});
   const body=req.body||{};const action=String(body.action||"");
   if(action==="login")return sameSecret(body.password,ADMIN_PASSWORD)?res.status(200).json({token:tokenFor(ADMIN_SESSION_SECRET)}):res.status(401).json({error:"login_failed"});
   const bearer=String(req.headers.authorization||"").replace(/^Bearer\s+/i,"");if(!validToken(bearer,ADMIN_SESSION_SECRET))return res.status(401).json({error:"session_expired"});
-  const base=new URL("/rest/v1/",SUPABASE_URL);const request=async(path,options={})=>{const response=await fetch(new URL(path,base),{...options,headers:{apikey:SUPABASE_SERVICE_ROLE_KEY,Authorization:`Bearer ${SUPABASE_SERVICE_ROLE_KEY}`,"Content-Type":"application/json",...(options.headers||{})}});const text=await response.text();if(!response.ok)throw new Error("database_request_failed");return text?JSON.parse(text):null;};
+  const base=new URL("/rest/v1/",projectUrl);const request=async(path,options={})=>{const response=await fetch(new URL(path,base),{...options,headers:supabaseHeaders(key,{"Content-Type":"application/json",...(options.headers||{})})});const text=await response.text();if(!response.ok)throw new Error("database_request_failed");return text?JSON.parse(text):null;};
   try{
     if(action==="products")return res.status(200).json({products:await request("products?select=*&order=created_at.desc")});
     if(action==="orders")return res.status(200).json({orders:await request("orders?select=*,order_items(*)&order=created_at.desc&limit=100")});

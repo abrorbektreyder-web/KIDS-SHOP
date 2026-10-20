@@ -1,4 +1,5 @@
 const crypto=require("node:crypto");
+const {getSupabaseConfig,supabaseHeaders}=require("./_supabase");
 const escapeHtml=(value)=>String(value||"").replace(/[&<>"']/g,ch=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[ch]));
 function verifyTelegramInitData(initData,botToken){
   if(!initData)return false;
@@ -12,9 +13,10 @@ function verifyTelegramInitData(initData,botToken){
 }
 module.exports=async function handler(req,res){
   if(req.method!=="POST"){res.setHeader("Allow","POST");return res.status(405).json({error:"method_not_allowed"});}
-  const {SUPABASE_URL,SUPABASE_SERVICE_ROLE_KEY,TELEGRAM_BOT_TOKEN,TELEGRAM_GROUP_ID,TELEGRAM_OPERATOR_ID,ORDERS_ENABLED}=process.env;
+  const {url,key}=getSupabaseConfig();
+  const {TELEGRAM_BOT_TOKEN,TELEGRAM_GROUP_ID,TELEGRAM_OPERATOR_ID,ORDERS_ENABLED}=process.env;
   if(ORDERS_ENABLED!=="true")return res.status(503).json({error:"orders_not_open"});
-  if(!SUPABASE_URL||!SUPABASE_SERVICE_ROLE_KEY)return res.status(503).json({error:"database_not_configured"});
+  if(!url||!key)return res.status(503).json({error:"database_not_configured"});
   if(!TELEGRAM_BOT_TOKEN||!TELEGRAM_GROUP_ID||!TELEGRAM_OPERATOR_ID)return res.status(503).json({error:"telegram_not_configured"});
   const body=req.body||{};const c=body.customer||{};const items=Array.isArray(body.items)?body.items:[];
   const phone=String(c.phone||"").replace(/[^+\d]/g,"");
@@ -23,7 +25,7 @@ module.exports=async function handler(req,res){
   const cleanItems=items.map(item=>({productId:String(item.productId||"").slice(0,80),size:String(item.size||"").slice(0,32),qty:Math.max(1,Math.min(20,Number(item.qty)||1))}));
   const payload={customer:{name:String(c.name).trim().slice(0,120),phone,region:String(c.region).slice(0,100),district:String(c.district).slice(0,100),address:String(c.address).slice(0,500),comment:String(c.comment||"").slice(0,500)},payment:"cod",lang:body.lang==="ru"?"ru":"uz",items:cleanItems};
   try{
-    const rpc=await fetch(new URL("/rest/v1/rpc/place_order",SUPABASE_URL),{method:"POST",headers:{apikey:SUPABASE_SERVICE_ROLE_KEY,Authorization:`Bearer ${SUPABASE_SERVICE_ROLE_KEY}`,"Content-Type":"application/json"},body:JSON.stringify({order_payload:payload})});
+    const rpc=await fetch(new URL("/rest/v1/rpc/place_order",url),{method:"POST",headers:supabaseHeaders(key,{"Content-Type":"application/json"}),body:JSON.stringify({order_payload:payload})});
     const result=await rpc.json();if(!rpc.ok)throw new Error(result.message||"order_save_failed");
     const order=Array.isArray(result)?result[0]:result;const orderId=order.order_id||order.id;const total=Number(order.total||0);
     if(!orderId)throw new Error("order_save_failed");
