@@ -11,7 +11,7 @@ create table if not exists public.products (
   old_price integer check (old_price is null or old_price >= price),
   age text not null default '',
   colors text[] not null default '{}',
-  image_url text not null default '/images/look-safari.png',
+  image_url text not null default '/images/look-safari.webp',
   badge text not null default '',
   tagline_uz text not null default '',
   tagline_ru text not null default '',
@@ -108,12 +108,12 @@ grant execute on function public.place_order(jsonb) to service_role;
 
 insert into public.products(id,name_uz,name_ru,category,type,price,old_price,age,colors,image_url,badge,tagline_uz,tagline_ru,sizes,stock)
 values
-('look-safari','Safari mini ko‘ylak','Комплект Safari mini','boys','sets',219000,259000,'3–8 yosh',array['#d5a76e','#819267','#e9e2d2'],'/images/look-safari.png','HIT','Yengil paxta • kundalik qulaylik','Лёгкий хлопок • комфорт на каждый день',array['2–3 yosh','3–4 yosh','5–6 yosh','7–8 yosh'],10),
-('little-adventure','Adventure kundalik set','Повседневный комплект Adventure','boys','sets',289000,null,'2–6 yosh',array['#2165d5','#f2d333','#f1ead9'],'/images/look-adventure.png','YANGI','O‘yin va sarguzasht uchun','Для игр и приключений',array['2–3 yosh','3–4 yosh','5–6 yosh'],10),
-('sunshine-dress','Sunshine yozgi libos','Летнее платье Sunshine','girls','sets',249000,299000,'3–9 yosh',array['#edd276','#efb7ae','#d9e6c2'],'/images/kids-fashion-campaign.png','−17%','Yumshoq mato • bayramona kayfiyat','Мягкая ткань • праздничное настроение',array['3–4 yosh','5–6 yosh','7–8 yosh','9–10 yosh'],10),
-('little-star-shirt','Little Star ko‘ylak','Рубашка Little Star','boys','tops',179000,null,'2–8 yosh',array['#fffefa','#89a071','#c7dcf2'],'/images/look-safari.png','HIT','Nafas oluvchi paxta • qulay bichim','Дышащий хлопок • удобный крой',array['2–3 yosh','3–4 yosh','5–6 yosh','7–8 yosh'],10),
-('mini-explorer-set','Mini Explorer to‘plami','Комплект Mini Explorer','boys','sets',329000,null,'4–10 yosh',array['#2361d7','#e9dec6'],'/images/look-adventure.png','YANGI','Yengil qatlamlar • har kungi uslub','Лёгкие слои • стиль на каждый день',array['3–4 yosh','5–6 yosh','7–8 yosh','9–10 yosh'],10),
-('flower-day-dress','Flower Day ko‘ylagi','Платье Flower Day','girls','tops',229000,null,'3–8 yosh',array['#f3d9d5','#fffefa','#a2b37b'],'/images/kids-fashion-campaign.png','YANGI','Muloyim ranglar • erkin harakat','Нежные цвета • свобода движений',array['3–4 yosh','5–6 yosh','7–8 yosh'],10),
-('sunny-day-set','Sunny Day qulay set','Комплект Sunny Day','boys','sets',269000,319000,'2–7 yosh',array['#f3d34d','#2c61d6','#ede9df'],'/images/look-adventure.png','−16%','Yumshoq paxta • faol bolalar uchun','Мягкий хлопок • для активных детей',array['2–3 yosh','3–4 yosh','5–6 yosh','7–8 yosh'],10),
-('weekend-dress','Weekend mini libos','Платье Weekend mini','girls','tops',199000,null,'2–7 yosh',array['#aabd84','#e2c9a0','#eeb7a5'],'/images/kids-fashion-campaign.png','HIT','Har bir kun — kichik bayram','Каждый день — маленький праздник',array['2–3 yosh','3–4 yosh','5–6 yosh','7–8 yosh'],10)
+('look-safari','Safari mini ko‘ylak','Комплект Safari mini','boys','sets',219000,259000,'3–8 yosh',array['#d5a76e','#819267','#e9e2d2'],'/images/look-safari.webp','HIT','Yengil paxta • kundalik qulaylik','Лёгкий хлопок • комфорт на каждый день',array['2–3 yosh','3–4 yosh','5–6 yosh','7–8 yosh'],10),
+('little-adventure','Adventure kundalik set','Повседневный комплект Adventure','boys','sets',289000,null,'2–6 yosh',array['#2165d5','#f2d333','#f1ead9'],'/images/look-adventure.webp','YANGI','O‘yin va sarguzasht uchun','Для игр и приключений',array['2–3 yosh','3–4 yosh','5–6 yosh'],10),
+('sunshine-dress','Sunshine yozgi libos','Летнее платье Sunshine','girls','sets',249000,299000,'3–9 yosh',array['#edd276','#efb7ae','#d9e6c2'],'/images/kids-fashion-campaign.webp','−17%','Yumshoq mato • bayramona kayfiyat','Мягкая ткань • праздничное настроение',array['3–4 yosh','5–6 yosh','7–8 yosh','9–10 yosh'],10),
+('little-star-shirt','Little Star ko‘ylak','Рубашка Little Star','boys','tops',179000,null,'2–8 yosh',array['#fffefa','#89a071','#c7dcf2'],'/images/look-safari.webp','HIT','Nafas oluvchi paxta • qulay bichim','Дышащий хлопок • удобный крой',array['2–3 yosh','3–4 yosh','5–6 yosh','7–8 yosh'],10),
+('mini-explorer-set','Mini Explorer to‘plami','Комплект Mini Explorer','boys','sets',329000,null,'4–10 yosh',array['#2361d7','#e9dec6'],'/images/look-adventure.webp','YANGI','Yengil qatlamlar • har kungi uslub','Лёгкие слои • стиль на каждый день',array['3–4 yosh','5–6 yosh','7–8 yosh','9–10 yosh'],10),
+('flower-day-dress','Flower Day ko‘ylagi','Платье Flower Day','girls','tops',229000,null,'3–8 yosh',array['#f3d9d5','#fffefa','#a2b37b'],'/images/kids-fashion-campaign.webp','YANGI','Muloyim ranglar • erkin harakat','Нежные цвета • свобода движений',array['3–4 yosh','5–6 yosh','7–8 yosh'],10),
+('sunny-day-set','Sunny Day qulay set','Комплект Sunny Day','boys','sets',269000,319000,'2–7 yosh',array['#f3d34d','#2c61d6','#ede9df'],'/images/look-adventure.webp','−16%','Yumshoq paxta • faol bolalar uchun','Мягкий хлопок • для активных детей',array['2–3 yosh','3–4 yosh','5–6 yosh','7–8 yosh'],10),
+('weekend-dress','Weekend mini libos','Платье Weekend mini','girls','tops',199000,null,'2–7 yosh',array['#aabd84','#e2c9a0','#eeb7a5'],'/images/kids-fashion-campaign.webp','HIT','Har bir kun — kichik bayram','Каждый день — маленький праздник',array['2–3 yosh','3–4 yosh','5–6 yosh','7–8 yosh'],10)
 on conflict (id) do nothing;
