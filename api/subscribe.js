@@ -1,10 +1,14 @@
 const { getSupabaseConfig, supabaseHeaders } = require("./_supabase");
+const { takeRateLimit, rateLimitResponse } = require("./_rate-limit");
 
 module.exports = async function handler(req, res) {
+  res.setHeader("Cache-Control", "no-store");
   if (req.method !== "POST") {
     res.setHeader("Allow", "POST");
     return res.status(405).json({ error: "method_not_allowed" });
   }
+  const limit = takeRateLimit(req, "subscribe", 5, 10 * 60 * 1000);
+  if (limit.limited) return rateLimitResponse(res, limit.retryAfter);
 
   const { url: projectUrl, key } = getSupabaseConfig();
   const { TELEGRAM_BOT_TOKEN, TELEGRAM_GROUP_ID } = process.env;

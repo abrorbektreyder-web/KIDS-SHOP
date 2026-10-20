@@ -62,7 +62,7 @@ alter table public.products enable row level security;
 alter table public.orders enable row level security;
 alter table public.order_items enable row level security;
 alter table public.subscribers enable row level security;
-revoke all on public.products, public.orders, public.order_items, public.subscribers from anon, authenticated;
+revoke all on public.products, public.orders, public.order_items, public.subscribers from public, anon, authenticated;
 grant all on public.products, public.orders, public.order_items, public.subscribers to service_role;
 
 create or replace function public.place_order(order_payload jsonb)
