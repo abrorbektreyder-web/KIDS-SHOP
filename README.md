@@ -28,6 +28,6 @@ Three reference images provided in the task are copied into `public/images/`. Th
 - Final delivery price/timing/returns rules and real store support contacts. Review all business copy before launch; the remaining sample catalog names, product details, and images are placeholders.
 - Current payment method: cash on delivery. No card gateway is connected.
 - A customer sign-in method. Phone OTP needs an SMS provider; email magic links need a verified email sender. Favorites currently stay in the current browser, and the account/order-history UI is not wired until the sign-in provider is chosen.
-- The final Mini App bot username and Telegram group/operator chat IDs.
+- Enable the bot’s Main Mini App in BotFather and set its URL to the production site. The footer launcher resolves the bot username server-side from `TELEGRAM_BOT_TOKEN` and opens the Main Mini App when configured; otherwise it opens the bot profile.
 
 The static storefront files live in `public/`; `vercel.json` explicitly sets this as the output directory so Vercel serves `public/index.html`.
