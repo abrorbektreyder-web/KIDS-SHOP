@@ -137,17 +137,15 @@ module.exports = async function handler(req, res) {
       const adminPass = (process.env.ADMIN_PASSWORD || "").trim();
       const isAdminPassMatch = Boolean(adminPass && password === adminPass);
 
-      // Agar do'konda hali parol belgilanmagan bo'lsa (default kids-shop yoki bo'sh holat)
-      const isDefaultAllowed =
-        (!store.owner_password_hash || store.id === "kids-shop") &&
-        ["Shop2026!", "admin123", "admin"].includes(password);
+      // Agar do'konda hali parol belgilanmagan bo'lsa (birinchi marta kirish)
+      const isDefaultAllowed = !store.owner_password_hash && (password === "Shop2026!" || password === "admin123");
 
       if (!isHashMatch && !isAdminPassMatch && !isDefaultAllowed) {
         return res.status(401).json({ error: "invalid_credentials", message: "Parol noto‘g‘ri kiritildi." });
       }
 
-      // Agar paroli hali saqlanmagan bo'lsa yoki kids-shop bo'lsa, xeshni bazada yangilab qo'yamiz
-      if (!store.owner_password_hash || store.id === "kids-shop") {
+      // Agar paroli hali saqlanmagan bo'lsa, xeshni bazada yangilab qo'yamiz
+      if (!store.owner_password_hash) {
         try {
           await fetch(new URL(`/rest/v1/stores?id=eq.${encodeURIComponent(store.id)}`, url), {
             method: "PATCH",

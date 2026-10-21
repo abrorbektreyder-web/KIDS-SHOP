@@ -739,6 +739,8 @@
   // ==========================================================================
   // SETTINGS, VITRINA & TELEGRAM INTEGRATION (TAB 3)
   // ==========================================================================
+  const escapeHtml = esc;
+
   function renderCategoriesList() {
     if (!customCategoriesList) return;
     if (!state.categories || !state.categories.length) {

@@ -51,7 +51,7 @@ module.exports = async function handler(req, res) {
       const nameRu = String(p.name_ru || nameUz).trim().slice(0, 150);
       const price = Number.parseInt(p.price, 10);
       const oldPrice = p.old_price ? Number.parseInt(p.old_price, 10) : null;
-      const category = ["boys", "girls"].includes(p.category) ? p.category : "boys";
+      const category = String(p.category || "boys").toLowerCase().replace(/[^a-z0-9_-]/g, "").slice(0, 50) || "boys";
       const type = String(p.type || "sets").trim().slice(0, 50);
       const age = String(p.age || "").trim().slice(0, 50);
       const stock = Number.isInteger(Number(p.stock)) && Number(p.stock) >= 0 ? Number(p.stock) : 10;
@@ -131,7 +131,7 @@ module.exports = async function handler(req, res) {
       if (p.name_ru !== undefined) patchPayload.name_ru = String(p.name_ru).trim().slice(0, 150);
       if (p.price !== undefined) patchPayload.price = Number.parseInt(p.price, 10);
       if (p.old_price !== undefined) patchPayload.old_price = p.old_price ? Number.parseInt(p.old_price, 10) : null;
-      if (p.category !== undefined) patchPayload.category = p.category;
+      if (p.category !== undefined) patchPayload.category = String(p.category).toLowerCase().replace(/[^a-z0-9_-]/g, "").slice(0, 50) || "boys";
       if (p.type !== undefined) patchPayload.type = String(p.type).trim();
       if (p.age !== undefined) patchPayload.age = String(p.age).trim();
       if (p.stock !== undefined) patchPayload.stock = Math.max(0, Number.parseInt(p.stock, 10) || 0);

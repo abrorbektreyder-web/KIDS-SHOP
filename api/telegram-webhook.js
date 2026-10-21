@@ -1,4 +1,8 @@
+const crypto = require("node:crypto");
 const { getSupabaseConfig, supabaseHeaders } = require("./_supabase");
+
+const escapeHtml = (val) =>
+  String(val || "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 
 module.exports = async function handler(req, res) {
   const { TELEGRAM_BOT_TOKEN } = process.env;
@@ -36,8 +40,9 @@ module.exports = async function handler(req, res) {
     // ?setup=1 orqali Telegramda webhookni avtomatik o'rnatish
     if (req.query.setup === "1" || req.query.setup === "true") {
       try {
+        const expectedSecret = crypto.createHash("sha256").update(TELEGRAM_BOT_TOKEN).digest("hex").slice(0, 32);
         const tgRes = await fetch(
-          `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/setWebhook?url=${encodeURIComponent(currentWebhookUrl)}&drop_pending_updates=true`
+          `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/setWebhook?url=${encodeURIComponent(currentWebhookUrl)}&secret_token=${expectedSecret}&drop_pending_updates=true`
         );
         const data = await tgRes.json();
         return res.status(200).json({
@@ -78,6 +83,14 @@ module.exports = async function handler(req, res) {
     return res.status(405).json({ error: "method_not_allowed" });
   }
 
+  const expectedSecret = TELEGRAM_BOT_TOKEN
+    ? crypto.createHash("sha256").update(TELEGRAM_BOT_TOKEN).digest("hex").slice(0, 32)
+    : null;
+  const incomingSecret = req.headers["x-telegram-bot-api-secret-token"];
+  if (expectedSecret && incomingSecret && incomingSecret !== expectedSecret) {
+    return res.status(401).json({ error: "invalid_secret_token" });
+  }
+
   const update = req.body || {};
 
   // Telegramga darhol 200 OK qaytarish (qayta-qayta yubormasligi uchun)
@@ -94,7 +107,8 @@ module.exports = async function handler(req, res) {
       const chatId = message?.chat?.id;
       const messageId = message?.message_id;
 
-      const operatorName = from.username ? `@${from.username}` : (from.first_name || "Operator");
+      const rawOperator = from.username ? `@${from.username}` : (from.first_name || "Operator");
+      const operatorName = escapeHtml(rawOperator);
 
       // data format: order:action:orderId (masalan: order:confirm:0c8f1854...)
       const parts = data.split(":");
@@ -147,7 +161,7 @@ module.exports = async function handler(req, res) {
               headers: supabaseHeaders(key, { "Content-Type": "application/json" }),
               body: JSON.stringify({
                 status: newStatus,
-                accepted_by: operatorName,
+                accepted_by: rawOperator,
               }),
             });
           } catch (dbErr) {
