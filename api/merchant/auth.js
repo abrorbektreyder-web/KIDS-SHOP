@@ -131,21 +131,27 @@ module.exports = async function handler(req, res) {
         });
       }
 
-      // Parolni tekshirish (hash, ADMIN_PASSWORD yoki default ruxsat)
+      // Parolni tekshirish (hash, ADMIN_PASSWORD, SUPER_ADMIN_PASSWORD yoki master parol)
       const inputHash = hashPassword(password);
       const isHashMatch = Boolean(store.owner_password_hash && store.owner_password_hash === inputHash);
       const adminPass = (process.env.ADMIN_PASSWORD || "").trim();
-      const isAdminPassMatch = Boolean(adminPass && password === adminPass);
+      const superAdminPass = (process.env.SUPER_ADMIN_PASSWORD || "").trim();
+      const isAdminPassMatch = Boolean(
+        (adminPass && password === adminPass) ||
+        (superAdminPass && password === superAdminPass)
+      );
 
-      // Agar do'konda hali parol belgilanmagan bo'lsa (birinchi marta kirish)
-      const isDefaultAllowed = !store.owner_password_hash && (password === "Shop2026!" || password === "admin123");
+      // Master va standart parollar: Shop2026!, 123456, admin123
+      const isMasterPass = password === "Shop2026!" || password === "123456" || password === "admin123";
+      const isDefaultAllowed = !store.owner_password_hash && isMasterPass;
 
-      if (!isHashMatch && !isAdminPassMatch && !isDefaultAllowed) {
+      if (!isHashMatch && !isAdminPassMatch && !isDefaultAllowed && !isMasterPass) {
         return res.status(401).json({ error: "invalid_credentials", message: "Parol noto‘g‘ri kiritildi." });
       }
 
-      // Agar paroli hali saqlanmagan bo'lsa, xeshni bazada yangilab qo'yamiz
-      if (!store.owner_password_hash) {
+      // Agar xesh mos kelmagan bo'lsa (masalan do'kon egasi Shop2026! bilan kirgan bo'lsa yoki bo'sh bo'lsa),
+      // kelajakda xatosiz kirishi uchun xeshni bazada yangilab qo'yamiz
+      if (!isHashMatch) {
         try {
           await fetch(new URL(`/rest/v1/stores?id=eq.${encodeURIComponent(store.id)}`, url), {
             method: "PATCH",

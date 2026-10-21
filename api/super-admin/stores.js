@@ -243,6 +243,10 @@ module.exports = async function handler(req, res) {
         if (body.theme_color && /^#[0-9a-f]{6}$/i.test(body.theme_color)) patchPayload.theme_color = body.theme_color;
         if (["trial", "basic", "pro"].includes(body.plan)) patchPayload.plan = body.plan;
         if (body.custom_domain !== undefined) patchPayload.custom_domain = body.custom_domain ? String(body.custom_domain).trim().toLowerCase() : null;
+        if (body.owner_password) patchPayload.owner_password_hash = hashPassword(String(body.owner_password).trim());
+      } else if (action === "reset_password") {
+        const newPassword = String(body.owner_password || body.password || "Shop2026!").trim();
+        patchPayload.owner_password_hash = hashPassword(newPassword);
       } else {
         return res.status(400).json({ error: "invalid_patch_action" });
       }

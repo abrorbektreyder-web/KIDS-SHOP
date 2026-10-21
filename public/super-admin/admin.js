@@ -289,6 +289,7 @@
           <td class="text-right">
             <div class="action-buttons-group">
               <button class="btn-icon-action" data-action="view-links" data-id="${esc(store.id)}" title="Havolalarni ko‘rish">🔗</button>
+              <button class="btn-icon-action" data-action="reset-password" data-id="${esc(store.id)}" title="Parolni 'Shop2026!' ga tiklash">🔑</button>
               <button class="btn-icon-action success" data-action="extend-plan" data-id="${esc(store.id)}" title="+30 kun muddat qo‘shish">⏳ +30 kun</button>
               <button class="btn-icon-action ${isActive ? "danger" : "success"}" data-action="toggle-status" data-id="${esc(store.id)}" data-status="${store.status}">
                 ${isActive ? "🛑 Bloklash" : "🟢 Yoqish"}
@@ -377,6 +378,26 @@
         showToast(err.message, "error");
         btn.disabled = false;
       }
+      return;
+    }
+
+    // 4. Parolni Shop2026! ga tiklash
+    if (action === "reset-password") {
+      if (!confirm(`"${store.name}" do‘koni parolini "Shop2026!" ga tiklamoqchimisiz?`)) return;
+      btn.disabled = true;
+      try {
+        const res = await apiFetch("/api/super-admin/stores", {
+          method: "PATCH",
+          body: JSON.stringify({ action: "reset_password", storeId: id, owner_password: "Shop2026!" }),
+        });
+        if (!res.ok) throw new Error("Parolni tiklashda xatolik");
+        showToast(`"${store.name}" paroli "Shop2026!" ga muvaffaqiyatli tiklandi!`, "success");
+      } catch (err) {
+        showToast(err.message, "error");
+      } finally {
+        btn.disabled = false;
+      }
+      return;
     }
   });
 
@@ -388,7 +409,7 @@
     newStoreForm.reset();
     themeColorInput.value = "#285ae8";
     themeColorLabel.textContent = "#285ae8";
-    generatePassword();
+    ownerPasswordInput.value = "Shop2026!";
     newStoreModal.classList.remove("hidden");
     storeNameInput.focus();
   });
