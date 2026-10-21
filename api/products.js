@@ -129,7 +129,7 @@ module.exports = async function handler(req, res) {
       oldPrice: p.old_price,
       age: p.age,
       colors: p.colors || [],
-      image: imageCounts.get(p.image_url) > 1 ? (demoById.get(p.id)?.image || p.image_url) : p.image_url,
+      image: p.image_url,
       badge: p.badge,
       tagline: { uz: p.tagline_uz, ru: p.tagline_ru },
       sizes: p.sizes || [],
