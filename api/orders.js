@@ -26,14 +26,22 @@ module.exports=async function handler(req,res){
   if(String(c.name||"").trim().length<2||String(c.name||"").length>120||phone.replace(/\D/g,"").length<9||phone.replace(/\D/g,"").length>15||String(c.address||"").trim().length<5||String(c.address||"").length>500||!String(c.region||"").trim()||String(c.region).length>100||!String(c.district||"").trim()||String(c.district).length>100||String(c.comment||"").length>500||!items.length||items.length>20)return res.status(400).json({error:"invalid_order"});
   if(body.telegramInitData&&!verifyTelegramInitData(body.telegramInitData,TELEGRAM_BOT_TOKEN))return res.status(401).json({error:"invalid_telegram_session"});
   if(items.some(item=>!item||typeof item!=="object"||!String(item.productId||"").trim()||String(item.productId).length>80||!String(item.size||"").trim()||String(item.size).length>32||!Number.isInteger(Number(item.qty))||Number(item.qty)<1||Number(item.qty)>20))return res.status(400).json({error:"invalid_order_items"});
-  const cleanItems=items.map(item=>({productId:String(item.productId).trim(),size:String(item.size).trim(),qty:Number(item.qty)}));
-  const payload={customer:{name:String(c.name).trim().slice(0,120),phone,region:String(c.region).slice(0,100),district:String(c.district).slice(0,100),address:String(c.address).slice(0,500),comment:String(c.comment||"").slice(0,500)},payment:"cod",lang:body.lang==="ru"?"ru":"uz",items:cleanItems};
+  const cleanItems=items.map(item=>({
+    productId:String(item.productId).trim(),
+    size:String(item.size).trim(),
+    color:String(item.colorName||item.color||"").trim().slice(0,50),
+    qty:Number(item.qty)
+  }));
+  const payload={customer:{name:String(c.name).trim().slice(0,120),phone,region:String(c.region).slice(0,100),district:String(c.district).slice(0,100),address:String(c.address).slice(0,500),comment:String(c.comment||"").slice(0,500)},payment:"cod",lang:body.lang==="ru"?"ru":"uz",items:cleanItems.map(i=>({productId:i.productId,size:i.size,qty:i.qty}))};
   try{
     const rpc=await fetch(new URL("/rest/v1/rpc/place_order",url),{method:"POST",headers:supabaseHeaders(key,{"Content-Type":"application/json"}),body:JSON.stringify({order_payload:payload})});
     const result=await rpc.json();if(!rpc.ok)throw new Error(result.message||"order_save_failed");
     const order=Array.isArray(result)?result[0]:result;const orderId=order.order_id||order.id;const total=Number(order.total||0);
     if(!orderId)throw new Error("order_save_failed");
-    const tgItems=(order.items||[]).map(i=>`• ${escapeHtml(i.name)} — ${escapeHtml(i.size)} × ${i.qty}: ${Number(i.unitPrice*i.qty||0).toLocaleString("ru-RU")} сум`).join("\n");
+    const tgItems=(order.items||[]).map((i,idx)=>{
+      const col=cleanItems[idx]?.color?` [Rang: ${escapeHtml(cleanItems[idx].color)}]`:"";
+      return `• ${escapeHtml(i.name)} — ${escapeHtml(i.size)}${col} × ${i.qty}: ${Number(i.unitPrice*i.qty||0).toLocaleString("ru-RU")} сум`;
+    }).join("\n");
     const report=`🧸 <b>KIDS-SHOP · YANGI BUYURTMA</b>\n\n<b>№ ${escapeHtml(String(orderId).slice(0,8).toUpperCase())}</b>\n👤 ${escapeHtml(payload.customer.name)}\n📞 <a href="tel:${escapeHtml(phone)}">${escapeHtml(phone)}</a>\n📍 ${escapeHtml(payload.customer.region)}, ${escapeHtml(payload.customer.district)}\n🏠 ${escapeHtml(payload.customer.address)}\n💳 ${payload.payment==="cod"?"Yetkazilganda to‘lov":"Karta (operator tasdiqlasin)"}\n\n${tgItems}\n\n<b>Jami: ${total.toLocaleString("ru-RU")} so‘m</b>${payload.customer.comment?`\n\n💬 ${escapeHtml(payload.customer.comment)}`:""}`;
     const send=async chat_id=>{const r=await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({chat_id,text:report,parse_mode:"HTML",disable_web_page_preview:true})});const result=await r.json().catch(()=>null);if(!r.ok||!result?.ok)throw new Error("telegram_delivery_failed");};
     const delivery=await Promise.allSettled([send(TELEGRAM_GROUP_ID)]);

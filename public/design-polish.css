@@ -219,3 +219,131 @@ body { color: var(--ink); font-size: 16px; line-height: 1.55; }
 @media (prefers-reduced-motion: reduce) {
   .product-image-wrap img, .desktop-nav a::after { transition: none; }
 }
+
+
+/* ============================================================
+   KIDS-SHOP: Rang va O'lcham (Size & Color) Tanlash Uslublari
+   ============================================================ */
+.product-option-section {
+  margin-top: 14px;
+}
+.option-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+.option-title {
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: var(--ink);
+}
+.option-selected-name {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--blue);
+}
+.color-options {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.color-chip {
+  min-height: 40px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border: 1.5px solid var(--line);
+  background: #fff;
+  border-radius: 10px;
+  padding: 4px 12px 4px 6px;
+  cursor: pointer;
+  transition: all .18s ease;
+}
+.color-chip:hover {
+  border-color: #bec5d0;
+  transform: translateY(-1px);
+}
+.color-chip.selected {
+  border-color: var(--ink);
+  background: #fff;
+  box-shadow: 0 0 0 2px var(--ink);
+}
+.color-circle {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 1px solid rgba(0, 0, 0, .14);
+  flex-shrink: 0;
+  display: inline-block;
+}
+.color-chip-name {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--ink);
+}
+.color-check {
+  font-size: 12px;
+  font-weight: 900;
+  color: var(--blue);
+  margin-left: 2px;
+}
+
+/* Enhanced Size Options */
+.size-options {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+  gap: 8px;
+}
+.size-chip {
+  min-height: 52px;
+  border: 1.5px solid var(--line);
+  background: #fff;
+  border-radius: 10px;
+  padding: 6px 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: 2px;
+  cursor: pointer;
+  transition: all .18s ease;
+}
+.size-chip:hover {
+  border-color: #bec5d0;
+  transform: translateY(-1px);
+}
+.size-chip.selected {
+  background: var(--ink);
+  border-color: var(--ink);
+  color: #fff;
+  box-shadow: 0 4px 12px rgba(32, 37, 31, .16);
+}
+.size-val {
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: -.01em;
+}
+.size-sub {
+  font-size: 11px;
+  font-weight: 600;
+  opacity: .75;
+}
+.size-chip.selected .size-sub {
+  opacity: .9;
+  color: #f7f9f6;
+}
+
+/* Swatch in cart */
+.swatch-inline {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 1px solid rgba(0, 0, 0, .18);
+  vertical-align: middle;
+  margin-inline: 3px 1px;
+}
