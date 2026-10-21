@@ -13,7 +13,7 @@ function getSecret() {
 }
 
 function getExpectedPassword() {
-  return process.env.SUPER_ADMIN_PASSWORD || process.env.ADMIN_PASSWORD || "admin123";
+  return (process.env.SUPER_ADMIN_PASSWORD || process.env.ADMIN_PASSWORD || "").trim();
 }
 
 function createToken() {
