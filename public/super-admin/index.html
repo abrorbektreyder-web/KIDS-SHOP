@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Super Admin Dashboard · SaaS Platform</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="admin.css" />
+</head>
+<body class="saas-body">
+
+  <!-- ========================================== -->
+  <!-- 1. LOGIN SCREEN                           -->
+  <!-- ========================================== -->
+  <div id="loginScreen" class="login-wrapper">
+    <div class="login-card">
+      <div class="login-header">
+        <div class="platform-badge">SaaS Super Admin</div>
+        <h1 class="login-title">Platforma Boshqaruv Markazi</h1>
+        <p class="login-subtitle">Barcha internet-do‘konlar va obunalarni markazlashgan nazorat qilish</p>
+      </div>
+
+      <form id="loginForm" class="login-form">
+        <div class="form-group">
+          <label for="adminPassword" class="form-label">Super Admin Maxfiy Kaliti</label>
+          <div class="input-password-wrap">
+            <input type="password" id="adminPassword" class="form-input" placeholder="••••••••••••" required autocomplete="current-password" />
+            <button type="button" id="togglePasswordBtn" class="btn-toggle-eye" aria-label="Parolni ko‘rsatish">👁</button>
+          </div>
+        </div>
+
+        <div id="loginError" class="auth-error-msg" role="alert"></div>
+
+        <button type="submit" id="loginSubmitBtn" class="btn-primary w-full">
+          <span>Tizimga Kirish</span>
+          <span class="btn-icon">→</span>
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- 2. MAIN DASHBOARD                         -->
+  <!-- ========================================== -->
+  <div id="dashboardApp" class="dashboard-layout hidden">
+    
+    <!-- Topbar -->
+    <header class="topbar">
+      <div class="topbar-left">
+        <div class="brand-group">
+          <div class="brand-avatar">🚀</div>
+          <div>
+            <div class="brand-title">KIDS-SHOP SaaS</div>
+            <div class="brand-sub">Super Admin v2.0</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="topbar-right">
+        <a href="/" target="_blank" class="btn-outline-sm">🌐 Asosiy Sayt</a>
+        <button id="logoutBtn" class="btn-ghost-sm">Chiqish ↗</button>
+      </div>
+    </header>
+
+    <main class="main-content">
+      
+      <!-- KPI Stats Grid -->
+      <section class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-icon-wrap bg-blue-glow">🏪</div>
+          <div class="stat-data">
+            <div class="stat-label">Jami Do‘konlar</div>
+            <div class="stat-value" id="kpiTotalStores">0</div>
+            <div class="stat-sub" id="kpiStoresSub">0 faol · 0 to‘xtatilgan</div>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon-wrap bg-emerald-glow">⚡</div>
+          <div class="stat-data">
+            <div class="stat-label">Faol Vitrinalar</div>
+            <div class="stat-value" id="kpiActiveStores">0</div>
+            <div class="stat-sub text-emerald">100% onlayn ishlamoqda</div>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon-wrap bg-amber-glow">📦</div>
+          <div class="stat-data">
+            <div class="stat-label">Jami Buyurtmalar</div>
+            <div class="stat-value" id="kpiTotalOrders">0</div>
+            <div class="stat-sub" id="kpiTotalRevenue">Tushum: 0 so‘m</div>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon-wrap bg-purple-glow">💎</div>
+          <div class="stat-data">
+            <div class="stat-label">Kutilayotgan Oylik Tushum (MRR)</div>
+            <div class="stat-value" id="kpiEstimatedMRR">0 so‘m</div>
+            <div class="stat-sub" id="kpiExpiringSub">0 ta do‘kon muddati yaqin</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Table Section -->
+      <section class="table-card">
+        
+        <!-- Controls bar -->
+        <div class="table-header-bar">
+          <div class="search-wrap">
+            <span class="search-icon">🔍</span>
+            <input type="text" id="searchInput" class="search-input" placeholder="Do‘kon nomi, slug yoki telefon bo‘yicha qidirish..." />
+          </div>
+
+          <div class="filters-and-actions">
+            <div class="filter-group">
+              <button class="filter-btn active" data-filter="all">Barchasi</button>
+              <button class="filter-btn" data-filter="active">Faol</button>
+              <button class="filter-btn" data-filter="suspended">To‘xtatilgan</button>
+              <button class="filter-btn" data-filter="expiring">Tugayotgan</button>
+            </div>
+
+            <button id="openNewStoreModalBtn" class="btn-primary">
+              <span>+ Yangi Do‘kon Ochish</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Stores Table -->
+        <div class="table-responsive">
+          <table class="saas-table">
+            <thead>
+              <tr>
+                <th>Do‘kon Nomi & ID</th>
+                <th>Egasi & Aloqa</th>
+                <th>Tarif & Muddat</th>
+                <th>Buyurtmalar</th>
+                <th>Holat</th>
+                <th class="text-right">Boshqaruv</th>
+              </tr>
+            </thead>
+            <tbody id="storesTableBody">
+              <tr>
+                <td colspan="6" class="loading-state">Ma’lumotlar yuklanmoqda…</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+      </section>
+
+    </main>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- 3. MODAL: YANGI DO'KON QO'SHISH            -->
+  <!-- ========================================== -->
+  <div id="newStoreModal" class="modal-backdrop hidden">
+    <div class="modal-box">
+      <div class="modal-header">
+        <div>
+          <h2 class="modal-title">+ Yangi Do‘kon Yaratish</h2>
+          <p class="modal-sub">Do‘kon uchun avtomatik Web-sayt, Telegram Mini App va Admin panel ochiladi</p>
+        </div>
+        <button class="btn-close-modal" data-close-modal="newStoreModal">✕</button>
+      </div>
+
+      <form id="newStoreForm" class="modal-form">
+        <div class="form-row-2">
+          <div class="form-group">
+            <label class="form-label" for="storeName">Do‘kon Nomi *</label>
+            <input type="text" id="storeName" class="form-input" placeholder="Masalan: Safari Kids Wear" required />
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="storeSlug">Do‘kon Identifikatori (Slug) *</label>
+            <input type="text" id="storeSlug" class="form-input font-mono" placeholder="safari-kids" required pattern="[a-z0-9-]+" />
+            <small class="form-hint">Faqat kichik inglizcha harflar va chiziqcha: safari-kids</small>
+          </div>
+        </div>
+
+        <div class="form-row-2">
+          <div class="form-group">
+            <label class="form-label" for="ownerPhone">Tadbirkor Telefoni *</label>
+            <input type="tel" id="ownerPhone" class="form-input" placeholder="+998901234567" required />
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="ownerPassword">Boshlang‘ich Parol *</label>
+            <div class="input-password-wrap">
+              <input type="text" id="ownerPassword" class="form-input font-mono" placeholder="Parol" required value="Shop2026!" />
+              <button type="button" id="btnGenPassword" class="btn-sub-action">Generatsiya</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="telegramChatId">Telegram Guruh/Kanal ID (Buyurtmalar uchun) *</label>
+          <input type="text" id="telegramChatId" class="form-input font-mono" placeholder="-1001234567890" required />
+          <small class="form-hint">Tadbirkorning buyurtmalar tushadigan shaxsiy guruhining ID raqami</small>
+        </div>
+
+        <div class="form-row-3">
+          <div class="form-group">
+            <label class="form-label" for="storePlan">Tarif Rejasi</label>
+            <select id="storePlan" class="form-input">
+              <option value="basic" selected>Basic (Oylik)</option>
+              <option value="pro">Pro (Yillik)</option>
+              <option value="trial">Trial (14 kunlik sinov)</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="storeDays">Muddat (Kun)</label>
+            <input type="number" id="storeDays" class="form-input" value="30" min="1" max="1000" />
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="themeColor">Do‘kon Asosiy Rangi</label>
+            <div class="color-picker-wrap">
+              <input type="color" id="themeColor" class="color-swatch-input" value="#285ae8" />
+              <span id="themeColorLabel" class="color-label-text">#285ae8</span>
+            </div>
+          </div>
+        </div>
+
+        <div id="newStoreError" class="auth-error-msg"></div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn-outline" data-close-modal="newStoreModal">Bekor qilish</button>
+          <button type="submit" id="btnSubmitNewStore" class="btn-primary">
+            <span>Do‘konni Ochish</span>
+            <span class="btn-icon">→</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- 4. MODAL: DO'KON YARATILDI (SUCCESS LINKS) -->
+  <!-- ========================================== -->
+  <div id="successStoreModal" class="modal-backdrop hidden">
+    <div class="modal-box modal-box-wide">
+      <div class="modal-header">
+        <div>
+          <span class="success-pill">✓ Muvaffaqiyatli Yaratildi</span>
+          <h2 class="modal-title mt-2" id="successStoreTitle">Do‘kon Tayyor!</h2>
+          <p class="modal-sub">Quyidagi havolalarni tadbirkorga taqdim etishingiz mumkin:</p>
+        </div>
+        <button class="btn-close-modal" data-close-modal="successStoreModal">✕</button>
+      </div>
+
+      <div class="success-links-list">
+        <!-- Web Vitrina -->
+        <div class="link-item">
+          <div class="link-info">
+            <div class="link-badge">🌐 Veb-Sayt (Vitrina)</div>
+            <div class="link-url" id="linkWeb">https://...</div>
+          </div>
+          <button class="btn-copy" data-copy-target="linkWeb">Nusxalash</button>
+        </div>
+
+        <!-- Telegram Mini App -->
+        <div class="link-item">
+          <div class="link-info">
+            <div class="link-badge tg-badge">📱 Telegram Mini App</div>
+            <div class="link-url" id="linkTg">https://t.me/...</div>
+          </div>
+          <button class="btn-copy" data-copy-target="linkTg">Nusxalash</button>
+        </div>
+
+        <!-- Merchant Admin -->
+        <div class="link-item">
+          <div class="link-info">
+            <div class="link-badge admin-badge">🔐 Tadbirkor Admin Paneli</div>
+            <div class="link-url" id="linkAdmin">https://.../admin</div>
+          </div>
+          <button class="btn-copy" data-copy-target="linkAdmin">Nusxalash</button>
+        </div>
+      </div>
+
+      <!-- Prepared Message for Merchant -->
+      <div class="prepared-msg-box">
+        <div class="prepared-msg-header">
+          <span>📨 Tadbirkorga yuborish uchun tayyor xabarnoma matni:</span>
+          <button id="btnCopyFullTelegramMsg" class="btn-outline-sm">Barchasini Nusxalash</button>
+        </div>
+        <pre id="preparedFullMsgText" class="prepared-msg-pre"></pre>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn-primary w-full" data-close-modal="successStoreModal">Tushunarli / Yopish</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- 5. MODAL: HAVOLALARNI KO'RISH              -->
+  <!-- ========================================== -->
+  <div id="viewLinksModal" class="modal-backdrop hidden">
+    <div class="modal-box">
+      <div class="modal-header">
+        <div>
+          <h2 class="modal-title" id="viewLinksTitle">Do‘kon Havolalari</h2>
+          <p class="modal-sub" id="viewLinksSlug"></p>
+        </div>
+        <button class="btn-close-modal" data-close-modal="viewLinksModal">✕</button>
+      </div>
+
+      <div class="success-links-list">
+        <div class="link-item">
+          <div class="link-info">
+            <div class="link-badge">🌐 Sayt Vitrinasi</div>
+            <div class="link-url" id="viewLinkWeb"></div>
+          </div>
+          <button class="btn-copy" data-copy-target="viewLinkWeb">Nusxalash</button>
+        </div>
+
+        <div class="link-item">
+          <div class="link-info">
+            <div class="link-badge tg-badge">📱 Telegram Mini App</div>
+            <div class="link-url" id="viewLinkTg"></div>
+          </div>
+          <button class="btn-copy" data-copy-target="viewLinkTg">Nusxalash</button>
+        </div>
+
+        <div class="link-item">
+          <div class="link-info">
+            <div class="link-badge admin-badge">🔐 Do‘kon Boshqaruvi (/admin)</div>
+            <div class="link-url" id="viewLinkAdmin"></div>
+          </div>
+          <button class="btn-copy" data-copy-target="viewLinkAdmin">Nusxalash</button>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn-outline w-full" data-close-modal="viewLinksModal">Yopish</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div id="toastContainer" class="toast-container" aria-live="polite"></div>
+
+  <script src="admin.js"></script>
+</body>
+</html>

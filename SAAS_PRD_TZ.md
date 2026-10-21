@@ -12,16 +12,16 @@
 ## 📌 JORIY HOLAT VA BAJARILGAN ISHLAR STATISTIKASI
 
 ```
-[========================================>--------------------] 43% Bajarildi
-Umumiy vazifalar: 28 ta | Bajarildi: 12 ta | Qoldi: 16 ta
+[==================================================>----------] 71% Bajarildi
+Umumiy vazifalar: 28 ta | Bajarildi: 20 ta | Qoldi: 8 ta
 ```
 
 | Faza / Yo‘nalish | Holati | Mas’ul |
 |---|---|---|
 | **0-Faza: Audit va Vitrina tuzatishlari** | ✅ **BAJARILDI (100%)** | Fullstack Dev |
 | **1-Faza: Ma’lumotlar bazasi va Multi-Tenant poydevor** | ✅ **BAJARILDI (100%)** | Database & Backend |
-| **2-Faza: Super Admin Panel (SaaS egasi uchun)** | ⏳ **NAVATDAGI ISH (0%)** | Frontend & Backend |
-| **3-Faza: Tadbirkor Shaxsiy Kabineti (Merchant Dashboard)** | ⚪ Kutilmoqda (0%) | Frontend & Backend |
+| **2-Faza: Super Admin Panel (SaaS egasi uchun)** | ✅ **BAJARILDI (100%)** | Frontend & Backend |
+| **3-Faza: Tadbirkor Shaxsiy Kabineti (Merchant Dashboard)** | ⏳ **NAVATDAGI ISH (0%)** | Frontend & Backend |
 | **4-Faza: Telegram Webhook va Interaktiv Tugmalar** | ⚪ Kutilmoqda (0%) | Telegram & Backend |
 | **5-Faza: Mustaqillik Testlari va Production Launch** | ⚪ Kutilmoqda (0%) | QA & DevOps |
 
@@ -52,17 +52,17 @@ Har bir vazifa bajarilgach, ushbu ro‘yxatda `[ ]` belgisi `[x]` ga o‘zgartir
 ---
 
 ### 2-FAZA: Super Admin Panel (Platforma Egasi Boshqaruvi - Sprint 2)
-- [ ] **TASK-201:** Super Admin uchun maxsus xavfsiz autentifikatsiya tizimi (`/api/super-admin/auth`).
-- [ ] **TASK-202:** Super Admin interfeys sahifasini yaratish (`/public/super-admin/index.html`).
-- [ ] **TASK-203:** **"+ Yangi do‘kon ochish"** modali va API si (Nom, slug, tadbirkor telefoni, boshlang‘ich parol, Telegram guruh ID).
-- [ ] **TASK-204:** Yangi do‘kon yaratilganda tizim avtomatik unga 3 ta havolani generatsiya qilishi:
+- [x] **TASK-201:** Super Admin uchun maxsus xavfsiz autentifikatsiya tizimi (`/api/super-admin/auth`).
+- [x] **TASK-202:** Super Admin interfeys sahifasini yaratish (`/public/super-admin/index.html`).
+- [x] **TASK-203:** **"+ Yangi do‘kon ochish"** modali va API si (Nom, slug, tadbirkor telefoni, boshlang‘ich parol, Telegram guruh ID).
+- [x] **TASK-204:** Yangi do‘kon yaratilganda tizim avtomatik unga 3 ta havolani generatsiya qilishi:
   - 🌐 Sayt havolasi: `safari.platforma.uz`
   - 📱 Telegram Mini App: `t.me/Platform_Bot?startapp=safari`
   - 🔐 Do‘kon admini: `safari.platforma.uz/admin`
-- [ ] **TASK-205:** Barcha do‘konlar ro‘yxati jadvali (Nomi, subdomeni, buyurtmalar soni, egasi telefoni, obuna muddati, holati).
-- [ ] **TASK-206:** Do‘konni bitta tugma bilan bloklash / faollashtirish (to‘lov qilmaganlar uchun vitrinani yopish).
-- [ ] **TASK-207:** Obuna muddatini uzaytirish tugmasi (+30 kun, +90 kun, +365 kun).
-- [ ] **TASK-208:** Global dashboard analitikasi (Jami do‘konlar, jami buyurtmalar, oylik kutilayotgan tushum MRR).
+- [x] **TASK-205:** Barcha do‘konlar ro‘yxati jadvali (Nomi, subdomeni, buyurtmalar soni, egasi telefoni, obuna muddati, holati).
+- [x] **TASK-206:** Do‘konni bitta tugma bilan bloklash / faollashtirish (to‘lov qilmaganlar uchun vitrinani yopish).
+- [x] **TASK-207:** Obuna muddatini uzaytirish tugmasi (+30 kun, +90 kun, +365 kun).
+- [x] **TASK-208:** Global dashboard analitikasi (Jami do‘konlar, jami buyurtmalar, oylik kutilayotgan tushum MRR).
 
 ---
 
