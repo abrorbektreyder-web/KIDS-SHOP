@@ -12,8 +12,8 @@
 ## 📌 JORIY HOLAT VA BAJARILGAN ISHLAR STATISTIKASI
 
 ```
-[==================================================>----------] 71% Bajarildi
-Umumiy vazifalar: 28 ta | Bajarildi: 20 ta | Qoldi: 8 ta
+[=========================================================>-] 96% Bajarildi
+Umumiy vazifalar: 28 ta | Bajarildi: 27 ta | Qoldi: 1 ta
 ```
 
 | Faza / Yo‘nalish | Holati | Mas’ul |
@@ -21,8 +21,8 @@ Umumiy vazifalar: 28 ta | Bajarildi: 20 ta | Qoldi: 8 ta
 | **0-Faza: Audit va Vitrina tuzatishlari** | ✅ **BAJARILDI (100%)** | Fullstack Dev |
 | **1-Faza: Ma’lumotlar bazasi va Multi-Tenant poydevor** | ✅ **BAJARILDI (100%)** | Database & Backend |
 | **2-Faza: Super Admin Panel (SaaS egasi uchun)** | ✅ **BAJARILDI (100%)** | Frontend & Backend |
-| **3-Faza: Tadbirkor Shaxsiy Kabineti (Merchant Dashboard)** | ⏳ **NAVATDAGI ISH (0%)** | Frontend & Backend |
-| **4-Faza: Telegram Webhook va Interaktiv Tugmalar** | ⚪ Kutilmoqda (0%) | Telegram & Backend |
+| **3-Faza: Tadbirkor Shaxsiy Kabineti (Merchant Dashboard)** | ✅ **BAJARILDI (100%)** | Frontend & Backend |
+| **4-Faza: Telegram Webhook va Interaktiv Tugmalar** | ⏳ **NAVATDAGI ISH (0%)** | Telegram & Backend |
 | **5-Faza: Mustaqillik Testlari va Production Launch** | ⚪ Kutilmoqda (0%) | QA & DevOps |
 
 ---
@@ -67,13 +67,13 @@ Har bir vazifa bajarilgach, ushbu ro‘yxatda `[ ]` belgisi `[x]` ga o‘zgartir
 ---
 
 ### 3-FAZA: Tadbirkor Shaxsiy Kabineti (Merchant Dashboard - Sprint 3)
-- [ ] **TASK-301:** Har bir tadbirkor uchun o‘z subdomenida (`/admin/`) shaxsiy login/parol tizimi.
-- [ ] **TASK-302:** Do‘kon egasi faqat o‘z tovarlarini ko‘rishi va yangi tovar qo‘shishi/tahrirlashi/o‘chirishi (CRUD).
-- [ ] **TASK-303:** Tovar qo‘shishda Ranglar palitrasi va Razmerlarni qulay checkboxlar orqali belgilash interfeysi.
-- [ ] **TASK-304:** Mahsulot rasmini yuklashda brauzerda avtomatik WebP ga siqish va Supabase Storage’ga yuklash.
-- [ ] **TASK-305:** Do‘konning shaxsiy buyurtmalar ro‘yxati va holatlarni yangilash (Yangi -> Tasdiqlandi -> Jo‘natildi -> Yetkazildi).
-- [ ] **TASK-306:** Telegram integratsiyasi sozlamalari (Guruh ID sini kiritish va "Sinov xabari yuborish" tugmasi).
-- [ ] **TASK-307:** Kassa va tushum hisoboti (Kunlik, haftalik, oylik tushum va Top sotilgan tovarlar).
+- [x] **TASK-301:** Har bir tadbirkor uchun o‘z subdomenida (`/admin/`) shaxsiy login/parol tizimi.
+- [x] **TASK-302:** Do‘kon egasi faqat o‘z tovarlarini ko‘rishi va yangi tovar qo‘shishi/tahrirlashi/o‘chirishi (CRUD).
+- [x] **TASK-303:** Tovar qo‘shishda Ranglar palitrasi va Razmerlarni qulay checkboxlar orqali belgilash interfeysi.
+- [x] **TASK-304:** Mahsulot rasmini yuklashda brauzerda avtomatik WebP ga siqish va Supabase Storage’ga yuklash.
+- [x] **TASK-305:** Do‘konning shaxsiy buyurtmalar ro‘yxati va holatlarni yangilash (Yangi -> Tasdiqlandi -> Jo‘natildi -> Yetkazildi).
+- [x] **TASK-306:** Telegram integratsiyasi sozlamalari (Guruh ID sini kiritish va "Sinov xabari yuborish" tugmasi).
+- [x] **TASK-307:** Kassa va tushum hisoboti (Kunlik, haftalik, oylik tushum va Top sotilgan tovarlar).
 
 ---
 

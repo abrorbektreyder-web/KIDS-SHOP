@@ -1,1 +1,387 @@
-<!doctype html><html lang="uz"><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/><meta name="robots" content="noindex,nofollow"/><meta name="theme-color" content="#f8f6ef"/><title>KIDS-SHOP — Boshqaruv</title><link rel="stylesheet" href="/admin/admin.css"/><script defer src="/admin/admin.js"></script></head><body><main class="admin-shell"><section class="login-card" id="loginCard"><a class="brand" href="/"><span class="brand-mark">k<span>•</span></span><span class="brand-word">KIDS<span>-SHOP</span></span></a><h1>Do‘kon boshqaruvi</h1><p>Buyurtmalar, katalog va zaxirani boshqarish uchun tizimga kiring.</p><form id="loginForm"><label>Admin paroli<span class="password-field"><input id="adminPassword" type="password" name="password" autocomplete="current-password" required minlength="10"/><button type="button" id="togglePassword" class="password-toggle" aria-label="Parolni ko‘rsatish" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></svg></button></span></label><button type="submit" class="primary">Kirish <span>→</span></button><p class="message" id="loginMessage" role="alert"></p></form><a class="back-link" href="/">← Do‘konga qaytish</a></section><section class="dashboard hidden" id="dashboard"><header class="dash-head"><div><span class="kicker">KIDS-SHOP</span><h1>Boshqaruv paneli</h1></div><button id="logoutButton" class="secondary">Chiqish</button></header><nav class="tabs" aria-label="Boshqaruv bo‘limlari"><button class="tab active" data-tab="orders">Buyurtmalar <span id="orderCount">0</span></button><button class="tab" data-tab="products">Mahsulotlar <span id="productCount">0</span></button></nav><p class="message" id="dashMessage" role="status"></p><section class="tab-panel" id="ordersPanel"></section><section class="tab-panel hidden" id="productsPanel"><div class="panel-heading"><div><h2>Katalog</h2><p>Mahsulot va mavjud zaxira sonini yangilang.</p></div><button class="primary" id="newProduct">+ Yangi mahsulot</button></div><div id="productList" class="product-list"></div><form class="product-form hidden" id="productForm"><div class="form-top"><h3 id="productFormTitle">Yangi mahsulot</h3><button class="icon-close" type="button" id="cancelProduct" aria-label="Yopish">×</button></div><div class="form-grid"><label>ID (lotin harflari)<input name="id" required pattern="[a-z0-9-]+" placeholder="yangi-mahsulot"/></label><label>Kategoriya<select name="category"><option value="boys">O‘g‘il bolalar</option><option value="girls">Qiz bolalar</option></select></label><label>Mahsulot nomi (UZ)<input name="name_uz" required/></label><label>Название (RU)<input name="name_ru" required/></label><label>Narxi, so‘m<input name="price" type="number" min="0" step="1000" required/></label><label>Eski narxi (ixtiyoriy)<input name="old_price" type="number" min="0" step="1000"/></label><label>Yosh oralig‘i<input name="age" placeholder="3–8 yosh"/></label><label>Zaxirada, dona<input name="stock" type="number" min="0" value="10" required/></label><div class="wide image-upload"><label for="productImageFile">Mahsulot rasmini yuklash</label><input id="productImageFile" type="file" accept="image/jpeg,image/png,image/webp"/><small>JPG, PNG yoki WebP. Rasm avtomatik siqiladi.</small><p class="upload-message" id="imageUploadMessage" role="status"></p><img id="productImagePreview" class="image-preview" src="/images/look-safari.webp" alt="Mahsulot rasmi ko‘rinishi"/><label for="productImageUrl">Rasm manzili</label><input id="productImageUrl" name="image_url" value="/images/look-safari.webp" required/></div><label class="wide">O‘lchamlar (vergul bilan)<input name="sizes" placeholder="2–3 yosh, 3–4 yosh, 5–6 yosh" required/></label><label>Tavsif (UZ)<input name="tagline_uz"/></label><label>Описание (RU)<input name="tagline_ru"/></label><label>Badge<input name="badge" placeholder="YANGI, HIT, −15%"/></label><label>Ranglar (# HEX, vergul)<input name="colors" placeholder="#f9d84c, #2361d7"/></label></div><div class="form-actions"><button class="secondary" id="cancelProduct2" type="button">Bekor qilish</button><button class="primary" type="submit">Saqlash</button></div></form></section><footer>Admin panel maxfiy. Havolani ommaga ulashmang.</footer></section></main></body></html>
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tadbirkor Kabineti · KIDS-SHOP SaaS</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/admin/admin.css" />
+</head>
+<body class="merchant-body">
+
+  <!-- ========================================================================= -->
+  <!-- 1. LOGIN SCREEN                                                           -->
+  <!-- ========================================================================= -->
+  <div id="loginScreen" class="merchant-login-wrap">
+    <div class="login-card">
+      <div class="login-header">
+        <span class="store-badge" id="loginStoreBadge">🏪 Do‘kon Kabineti</span>
+        <h1 class="login-title" id="loginStoreTitle">Do‘kon Boshqaruvi</h1>
+        <p class="login-sub">Mahsulotlar, narxlar va kelgan buyurtmalarni boshqarish</p>
+      </div>
+
+      <form id="merchantLoginForm" class="login-form">
+        <div class="form-group" id="storeFieldGroup">
+          <label class="form-label" for="loginStoreId">Do‘kon Identifikatori (yoki Telefon)</label>
+          <input type="text" id="loginStoreId" class="form-input font-mono" placeholder="masalan: safari-kids yoki +99890..." required />
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="loginPassword">Boshqaruv Paroli</label>
+          <div class="input-password-wrap">
+            <input type="password" id="loginPassword" class="form-input" placeholder="••••••••••••" required autocomplete="current-password" />
+            <button type="button" id="toggleLoginPassBtn" class="btn-eye" aria-label="Ko‘rsatish">👁</button>
+          </div>
+        </div>
+
+        <div id="loginError" class="auth-error-msg" role="alert"></div>
+
+        <button type="submit" id="btnSubmitLogin" class="btn-primary w-full">
+          <span>Kabinetga Kirish</span>
+          <span class="btn-icon">→</span>
+        </button>
+
+        <div class="login-footer-links">
+          <a href="/" id="backToStoreLink" class="back-link">← Vitrinaga qaytish</a>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ========================================================================= -->
+  <!-- 2. MAIN DASHBOARD                                                         -->
+  <!-- ========================================================================= -->
+  <div id="dashboardApp" class="dashboard-shell hidden">
+    
+    <!-- Topbar -->
+    <header class="merchant-topbar">
+      <div class="topbar-left">
+        <span class="store-color-indicator" id="storeColorDot"></span>
+        <div>
+          <div class="store-brand-title" id="topStoreName">Do‘kon Nomi</div>
+          <div class="store-brand-sub" id="topStoreSlug">slug</div>
+        </div>
+        <span class="plan-pill" id="topStorePlan">BASIC</span>
+      </div>
+
+      <div class="topbar-right">
+        <a id="btnViewLiveStore" href="/" target="_blank" class="btn-outline-sm">🌐 Vitrinani Ko‘rish</a>
+        <button id="merchantLogoutBtn" class="btn-ghost-sm">Chiqish ↗</button>
+      </div>
+    </header>
+
+    <!-- Navigation Tabs -->
+    <nav class="nav-tabs-bar">
+      <div class="tabs-container">
+        <button class="nav-tab active" data-tab="orders">
+          📦 Buyurtmalar <span class="tab-badge" id="badgeOrdersCount">0</span>
+        </button>
+        <button class="nav-tab" data-tab="products">
+          🛍 Mahsulotlar <span class="tab-badge" id="badgeProductsCount">0</span>
+        </button>
+        <button class="nav-tab" data-tab="settings">
+          ⚙️ Do‘kon & Telegram
+        </button>
+        <button class="nav-tab" data-tab="analytics">
+          📊 Kassa & Tushum
+        </button>
+      </div>
+    </nav>
+
+    <!-- Main Content Area -->
+    <main class="merchant-main">
+
+      <!-- ===================================================================== -->
+      <!-- TAB 1: BUYURTMALAR (ORDERS)                                            -->
+      <!-- ===================================================================== -->
+      <section id="tabOrders" class="tab-content active">
+        
+        <div class="section-toolbar">
+          <div class="search-wrap">
+            <span class="search-icon">🔍</span>
+            <input type="text" id="orderSearchInput" class="search-input" placeholder="Xaridor ismi yoki telefon raqami bo‘yicha qidirish..." />
+          </div>
+
+          <div class="filter-pills-group">
+            <button class="filter-pill active" data-order-status="all">Barchasi</button>
+            <button class="filter-pill" data-order-status="new">Yangi</button>
+            <button class="filter-pill" data-order-status="confirmed">Tasdiqlangan</button>
+            <button class="filter-pill" data-order-status="sent">Yo‘lda</button>
+            <button class="filter-pill" data-order-status="completed">Yetkazilgan</button>
+            <button class="filter-pill" data-order-status="cancelled">Bekor qilingan</button>
+          </div>
+        </div>
+
+        <div id="ordersListContainer" class="orders-cards-grid">
+          <div class="loading-state">Buyurtmalar yuklanmoqda…</div>
+        </div>
+
+      </section>
+
+      <!-- ===================================================================== -->
+      <!-- TAB 2: MAHSULOTLAR KATALOGI (PRODUCTS)                                -->
+      <!-- ===================================================================== -->
+      <section id="tabProducts" class="tab-content hidden">
+        
+        <div class="section-toolbar">
+          <div class="search-wrap">
+            <span class="search-icon">🔍</span>
+            <input type="text" id="productSearchInput" class="search-input" placeholder="Mahsulot nomi bo‘yicha qidirish..." />
+          </div>
+
+          <button id="btnOpenNewProductModal" class="btn-primary">
+            <span>+ Yangi Mahsulot</span>
+          </button>
+        </div>
+
+        <div id="productsGridContainer" class="products-dashboard-grid">
+          <div class="loading-state">Mahsulotlar yuklanmoqda…</div>
+        </div>
+
+      </section>
+
+      <!-- ===================================================================== -->
+      <!-- TAB 3: SOZLAMALAR VA TELEGRAM INTEGRATSIYASI                          -->
+      <!-- ===================================================================== -->
+      <section id="tabSettings" class="tab-content hidden">
+        <div class="settings-grid">
+          
+          <!-- Store Profile Card -->
+          <div class="settings-card">
+            <h2 class="card-title">🏪 Do‘kon Tafsilotlari</h2>
+            <p class="card-sub">Saytingizning ko‘rinishi va brendingini sozlang</p>
+
+            <form id="storeSettingsForm" class="settings-form">
+              <div class="form-group">
+                <label class="form-label" for="settingStoreName">Do‘kon Nomi</label>
+                <input type="text" id="settingStoreName" class="form-input" required />
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="settingThemeColor">Do‘kon Asosiy Rangi (Brending)</label>
+                <div class="color-picker-wrap">
+                  <input type="color" id="settingThemeColor" class="color-swatch-input" value="#285ae8" />
+                  <span id="settingThemeColorLabel" class="color-label-text">#285ae8</span>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Shaxsiy Domen</label>
+                <input type="text" id="settingCustomDomain" class="form-input" placeholder="masalan: safari.uz (ixtiyoriy)" />
+                <small class="form-hint">Shaxsiy domeningiz bo‘lsa, uni bog‘lash uchun administratorga murojaat qiling.</small>
+              </div>
+
+              <button type="submit" id="btnSaveStoreSettings" class="btn-primary">
+                <span>Sozlamalarni Saqlash</span>
+              </button>
+            </form>
+          </div>
+
+          <!-- Telegram Integration Card -->
+          <div class="settings-card">
+            <h2 class="card-title">📱 Telegram Integratsiyasi</h2>
+            <p class="card-sub">Buyurtmalar tushadigan shaxsiy guruh yoki kanalingizni ulang</p>
+
+            <form id="telegramSettingsForm" class="settings-form">
+              <div class="form-group">
+                <label class="form-label" for="settingTelegramChatId">Telegram Guruh/Kanal ID *</label>
+                <input type="text" id="settingTelegramChatId" class="form-input font-mono" placeholder="-1001234567890" required />
+                <small class="form-hint">Guruh ID raqami doim minus bilan boshlanadi: masalan -1001234567890</small>
+              </div>
+
+              <div class="guide-box">
+                <div class="guide-title">💡 3 Qadamda ulash:</div>
+                <ol class="guide-steps">
+                  <li>Telegram guruhingizga <b>@kids_shbot</b> ni a’zo qiling.</li>
+                  <li>Botga guruhda <b>Admin</b> huquqini bering (xabar yoza olishi uchun).</li>
+                  <li>Guruh ID sini bilish uchun <b>@raw_data_bot</b> ni guruhga qo‘shing yoki ID ni bu yerga kiriting.</li>
+                </ol>
+              </div>
+
+              <div class="actions-row">
+                <button type="button" id="btnTestTelegram" class="btn-outline">
+                  <span>⚡ Sinov Xabari Yuborish</span>
+                </button>
+                <button type="submit" id="btnSaveTelegramSettings" class="btn-primary">
+                  <span>Saqlash</span>
+                </button>
+              </div>
+            </form>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- ===================================================================== -->
+      <!-- TAB 4: KASSA VA TUSHUM ANALITIKASI                                    -->
+      <!-- ===================================================================== -->
+      <section id="tabAnalytics" class="tab-content hidden">
+        
+        <div class="analytics-kpi-grid">
+          <div class="stat-card">
+            <div class="stat-icon-wrap bg-blue-glow">☀️</div>
+            <div class="stat-data">
+              <div class="stat-label">Bugungi Savdo</div>
+              <div class="stat-value" id="kpiTodayRev">0 so‘m</div>
+              <div class="stat-sub" id="kpiTodayOrders">0 ta buyurtma</div>
+            </div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-icon-wrap bg-emerald-glow">📅</div>
+            <div class="stat-data">
+              <div class="stat-label">Haftalik Savdo</div>
+              <div class="stat-value" id="kpiWeekRev">0 so‘m</div>
+              <div class="stat-sub" id="kpiWeekOrders">0 ta buyurtma</div>
+            </div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-icon-wrap bg-purple-glow">📊</div>
+            <div class="stat-data">
+              <div class="stat-label">Oylik Savdo</div>
+              <div class="stat-value" id="kpiMonthRev">0 so‘m</div>
+              <div class="stat-sub" id="kpiMonthOrders">0 ta buyurtma</div>
+            </div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-icon-wrap bg-amber-glow">💰</div>
+            <div class="stat-data">
+              <div class="stat-label">Jami Tushum</div>
+              <div class="stat-value" id="kpiTotalRev">0 so‘m</div>
+              <div class="stat-sub" id="kpiTotalOrders">0 ta buyurtma</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Top Products List -->
+        <div class="top-products-card">
+          <h2 class="card-title">🏆 Eng Ko‘p Sotilgan Mahsulotlar (Top 5)</h2>
+          <div id="topProductsTableContainer">
+            <div class="loading-state">Analitika hisoblanmoqda…</div>
+          </div>
+        </div>
+
+      </section>
+
+    </main>
+  </div>
+
+  <!-- ========================================================================= -->
+  <!-- 3. MODAL: MAHSULOT QO'SHISH / TAHRIRLASH                                  -->
+  <!-- ========================================================================= -->
+  <div id="productModal" class="modal-backdrop hidden">
+    <div class="modal-box modal-box-wide">
+      <div class="modal-header">
+        <div>
+          <h2 class="modal-title" id="productModalTitle">Yangi Mahsulot Qo‘shish</h2>
+          <p class="modal-sub">Do‘koningiz vitrinasida bir zumda paydo bo‘ladi</p>
+        </div>
+        <button class="btn-close-modal" id="btnCloseProductModal">✕</button>
+      </div>
+
+      <form id="productEditForm" class="modal-form">
+        <input type="hidden" id="editProductId" />
+
+        <div class="form-row-2">
+          <div class="form-group">
+            <label class="form-label" for="prodNameUz">Mahsulot Nomi (O‘zbekcha) *</label>
+            <input type="text" id="prodNameUz" class="form-input" placeholder="Safari mini ko‘ylak" required />
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="prodNameRu">Mahsulot Nomi (Ruscha)</label>
+            <input type="text" id="prodNameRu" class="form-input" placeholder="Комплект Safari mini" />
+          </div>
+        </div>
+
+        <div class="form-row-3">
+          <div class="form-group">
+            <label class="form-label" for="prodPrice">Narxi (so‘m) *</label>
+            <input type="number" id="prodPrice" class="form-input" placeholder="219000" min="0" step="1000" required />
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="prodOldPrice">Eski Narxi (Chegirma uchun)</label>
+            <input type="number" id="prodOldPrice" class="form-input" placeholder="259000" min="0" step="1000" />
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="prodStock">Zaxiradagi soni (dona) *</label>
+            <input type="number" id="prodStock" class="form-input" value="10" min="0" required />
+          </div>
+        </div>
+
+        <div class="form-row-3">
+          <div class="form-group">
+            <label class="form-label" for="prodCategory">Kategoriya</label>
+            <select id="prodCategory" class="form-input">
+              <option value="boys">O‘g‘il bolalar</option>
+              <option value="girls">Qiz bolalar</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="prodType">Turi</label>
+            <select id="prodType" class="form-input">
+              <option value="sets">To‘plamlar (Sets)</option>
+              <option value="tops">Ko‘ylaklar / Futbolkalar</option>
+              <option value="bottoms">Shimlar / Shortiklar</option>
+              <option value="outerwear">Ustki kiyim</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="prodBadge">Belgi (Badge)</label>
+            <input type="text" id="prodBadge" class="form-input" placeholder="HIT, YANGI, −17%" />
+          </div>
+        </div>
+
+        <!-- Color Swatches Selector -->
+        <div class="form-group">
+          <label class="form-label">Mavjud Ranglar (Tanlang)</label>
+          <div class="color-checkboxes-grid" id="colorCheckboxesContainer">
+            <!-- Dynamically populated -->
+          </div>
+        </div>
+
+        <!-- Size Metrics Selector -->
+        <div class="form-group">
+          <label class="form-label">Mavjud O‘lcham va Yoshlar (Tanlang)</label>
+          <div class="size-checkboxes-grid" id="sizeCheckboxesContainer">
+            <!-- Dynamically populated -->
+          </div>
+        </div>
+
+        <!-- Image Upload & WebP Auto-compress -->
+        <div class="form-group">
+          <label class="form-label">Mahsulot Rasmi</label>
+          <div class="image-uploader-card">
+            <div class="image-preview-box">
+              <img id="modalImagePreview" src="/images/look-safari.webp" alt="Rasm ko‘rinishi" />
+            </div>
+            <div class="image-uploader-controls">
+              <input type="file" id="imageFileInput" accept="image/jpeg,image/png,image/webp" class="file-hidden-input" />
+              <button type="button" id="btnTriggerUpload" class="btn-outline-sm">📁 Rasmni tanlash (Avto WebP)</button>
+              <input type="text" id="prodImageUrl" class="form-input mt-2" placeholder="/images/look-safari.webp" required />
+              <small class="form-hint" id="uploadStatusText">JPG, PNG yoki WebP. Fayl avtomatik tarzda engil hajmga siqiladi.</small>
+            </div>
+          </div>
+        </div>
+
+        <div id="productFormError" class="auth-error-msg"></div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn-outline" id="btnCancelProductModal">Bekor qilish</button>
+          <button type="submit" id="btnSaveProductSubmit" class="btn-primary">
+            <span>Mahsulotni Saqlash</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Toast Container -->
+  <div id="toastContainer" class="toast-container" aria-live="polite"></div>
+
+  <script src="/admin/admin.js"></script>
+</body>
+</html>
