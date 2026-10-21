@@ -1,11 +1,97 @@
 # MULTI-TENANT E-COMMERCE SAAS PLATFORM
 ## MAHSULOTNING TO‘LIQ PRD (PRODUCT REQUIREMENTS DOCUMENT) VA TEXNIK VAZIFASI (TZ)
 
-> **Hujjat versiyasi:** 1.0.0-PRO  
+> **Hujjat holati:** AMALDA (LIVING DOCUMENT)  
+> **Joriy versiya:** 1.1.0-TRACKER  
 > **Muallif:** Senior Software Architect & Full-Stack Engineer  
 > **Loyiha nomi:** Universal Multi-Tenant E-Commerce SaaS Platform (Web + Telegram Mini App + Bot)  
-> **Maqsadli auditoriya:** Kichik va o‘rta tadbirkorlar (20 dan 1000+ gacha mustaqil do‘konlar)  
-> **Hujjat maqsadi:** Mavjud KIDS-SHOP kod bazasini to‘liq ko‘p do‘konli (Multi-Tenant) SaaS platformasiga aylantirish uchun yagona arxitektura va texnik standartlarni belgilash.
+> **Maqsad:** Loyihani bosqichma-bosqich, adashmasdan, har bir qadamni belgilab borish orqali to‘liq SaaS holatiga keltirish.
+
+---
+
+## 📌 JORIY HOLAT VA BAJARILGAN ISHLAR STATISTIKASI
+
+```
+[====================>----------------------------------------] 18% Bajarildi
+Umumiy vazifalar: 28 ta | Bajarildi: 5 ta | Qoldi: 23 ta
+```
+
+| Faza / Yo‘nalish | Holati | Mas’ul |
+|---|---|---|
+| **0-Faza: Audit va Vitrina tuzatishlari** | ✅ **BAJARILDI (100%)** | Fullstack Dev |
+| **1-Faza: Ma’lumotlar bazasi va Multi-Tenant poydevor** | ⏳ **NAVATDAGI ISH (0%)** | Database & Backend |
+| **2-Faza: Super Admin Panel (SaaS egasi uchun)** | ⚪ Kutilmoqda (0%) | Frontend & Backend |
+| **3-Faza: Tadbirkor Shaxsiy Kabineti (Merchant Dashboard)** | ⚪ Kutilmoqda (0%) | Frontend & Backend |
+| **4-Faza: Telegram Webhook va Interaktiv Tugmalar** | ⚪ Kutilmoqda (0%) | Telegram & Backend |
+| **5-Faza: Mustaqillik Testlari va Production Launch** | ⚪ Kutilmoqda (0%) | QA & DevOps |
+
+---
+
+## ✅ NAZORAT RO‘YXATI (LIVING TASK TRACKER)
+
+Har bir vazifa bajarilgach, ushbu ro‘yxatda `[ ]` belgisi `[x]` ga o‘zgartirib boriladi. Bu adashib ketishning oldini oladi.
+
+### 0-FAZA: Dastlabki Audit va Vitrina yaxshilanishlari (TAYYOR)
+- [x] **TASK-001:** Tizimning to‘liq professional texnik auditi (kod, xavfsizlik, hosting, ma’lumotlar bazasi tahlili).
+- [x] **TASK-002:** Vitrina mahsulot kartasi va draweriga ranglar palitrasini (`colors`) ulash.
+- [x] **TASK-003:** Ranglarni tanlash (Color picker) va tanlangan rang nomini o‘zbekcha/ruscha chiqarish.
+- [x] **TASK-004:** O‘lchamlarni faqat yosh emas, balki standart bo‘y/o‘lcham bilan birga ko‘rsatish (`92–98 sm · 2–3 yosh`).
+- [x] **TASK-005:** Tanlangan rang va o‘lchamni savatda, buyurtmada va Telegram hisobotiga to‘g‘ri uzatish.
+
+---
+
+### 1-FAZA: Ma’lumotlar bazasi va Multi-Tenant Poydevor (Sprint 1)
+- [ ] **TASK-101:** Supabase PostgreSQL’da `public.stores` (do‘konlar) jadvalini yaratish (ID/slug, nom, telefon, parol, Telegram chat ID, muddat).
+- [ ] **TASK-102:** `public.products`, `public.orders`, `public.order_items`, `public.subscribers` jadvallariga `store_id` ustunini va Foreign Key bog‘lanishlarini qo‘shish.
+- [ ] **TASK-103:** Tranzaksion `place_order` SQL funksiyasini `store_id` bo‘yicha tovar zaxirasini tekshiradigan va buyurtmani tegishli do‘konga yozadigan qilib yangilash.
+- [ ] **TASK-104:** 1000+ do‘konda qotmasligi uchun bazada `store_id` ustunlariga B-Tree indekslarini o‘rnatish.
+- [ ] **TASK-105:** `vercel.json`dagi `X-Frame-Options: DENY`ni olib tashlab, Telegram Mini App uchun to‘g‘ri CSP (`frame-ancestors`) o‘rnatish.
+- [ ] **TASK-106:** `GET /api/products` API sini `?store=...` so‘rovi bo‘yicha faqat o‘sha do‘kon tovarlarini filtrlaydigan qilish.
+- [ ] **TASK-107:** `POST /api/orders` API sini kelgan `store_id` orqali bazadan o‘sha do‘konning `telegram_chat_id` sini olib, buyurtmani aynan o‘sha guruhga yo‘naltiradigan qilish.
+
+---
+
+### 2-FAZA: Super Admin Panel (Platforma Egasi Boshqaruvi - Sprint 2)
+- [ ] **TASK-201:** Super Admin uchun maxsus xavfsiz autentifikatsiya tizimi (`/api/super-admin/auth`).
+- [ ] **TASK-202:** Super Admin interfeys sahifasini yaratish (`/public/super-admin/index.html`).
+- [ ] **TASK-203:** **"+ Yangi do‘kon ochish"** modali va API si (Nom, slug, tadbirkor telefoni, boshlang‘ich parol, Telegram guruh ID).
+- [ ] **TASK-204:** Yangi do‘kon yaratilganda tizim avtomatik unga 3 ta havolani generatsiya qilishi:
+  - 🌐 Sayt havolasi: `safari.platforma.uz`
+  - 📱 Telegram Mini App: `t.me/Platform_Bot?startapp=safari`
+  - 🔐 Do‘kon admini: `safari.platforma.uz/admin`
+- [ ] **TASK-205:** Barcha do‘konlar ro‘yxati jadvali (Nomi, subdomeni, buyurtmalar soni, egasi telefoni, obuna muddati, holati).
+- [ ] **TASK-206:** Do‘konni bitta tugma bilan bloklash / faollashtirish (to‘lov qilmaganlar uchun vitrinani yopish).
+- [ ] **TASK-207:** Obuna muddatini uzaytirish tugmasi (+30 kun, +90 kun, +365 kun).
+- [ ] **TASK-208:** Global dashboard analitikasi (Jami do‘konlar, jami buyurtmalar, oylik kutilayotgan tushum MRR).
+
+---
+
+### 3-FAZA: Tadbirkor Shaxsiy Kabineti (Merchant Dashboard - Sprint 3)
+- [ ] **TASK-301:** Har bir tadbirkor uchun o‘z subdomenida (`/admin/`) shaxsiy login/parol tizimi.
+- [ ] **TASK-302:** Do‘kon egasi faqat o‘z tovarlarini ko‘rishi va yangi tovar qo‘shishi/tahrirlashi/o‘chirishi (CRUD).
+- [ ] **TASK-303:** Tovar qo‘shishda Ranglar palitrasi va Razmerlarni qulay checkboxlar orqali belgilash interfeysi.
+- [ ] **TASK-304:** Mahsulot rasmini yuklashda brauzerda avtomatik WebP ga siqish va Supabase Storage’ga yuklash.
+- [ ] **TASK-305:** Do‘konning shaxsiy buyurtmalar ro‘yxati va holatlarni yangilash (Yangi -> Tasdiqlandi -> Jo‘natildi -> Yetkazildi).
+- [ ] **TASK-306:** Telegram integratsiyasi sozlamalari (Guruh ID sini kiritish va "Sinov xabari yuborish" tugmasi).
+- [ ] **TASK-307:** Kassa va tushum hisoboti (Kunlik, haftalik, oylik tushum va Top sotilgan tovarlar).
+
+---
+
+### 4-FAZA: Telegram Bot Webhook va Interaktiv Tugmalar (Sprint 4)
+- [ ] **TASK-401:** Do‘kon guruhiga boruvchi buyurtma xabari ostiga Inline tugmalar ulash: `[ ✅ Qabul qilish ]`, `[ 🚚 Yetkazildi ]`, `[ ❌ Bekor qilish ]`.
+- [ ] **TASK-402:** Serverda `/api/telegram-webhook.js` xizmatini yaratish va BotFather orqali webhookni ro‘yxatdan o‘tkazish.
+- [ ] **TASK-403:** Operator Telegramdagi "Qabul qilish" tugmasini bosganda, bazada statusni `confirmed` qilish va xabar matnini `"✅ Qabul qildi: @operator"` deb yangilash (`editMessageText`).
+- [ ] **TASK-404:** Telegram Mini App deep-linking (`startapp=slug`) mexanizmini to‘liq tekshirish va ishga tushirish.
+
+---
+
+### 5-FAZA: Sinovlar, Xavfsizlik va Production Launch (Sprint 5)
+- [ ] **TASK-501:** Do‘kon A va Do‘kon B ni ochib, to‘liq mustaqillikni amaliy tekshirish:
+  - Do‘kon A buyurtmasi Do‘kon B guruhiga aslo tushmasligi;
+  - Do‘kon A admini Do‘kon B tovarlarini ko‘ra olmasligi.
+- [ ] **TASK-502:** Telegram Mini App’ni Telegram Web, Desktop, Android va iOS ilovalarida test qilish.
+- [ ] **TASK-503:** Xavfsizlik va IDOR testlari (begona ID bilan tovar yoki buyurtmaga kirishni sinab ko‘rish va bloklash).
+- [ ] **TASK-504:** Asosiy `main` branchga merge qilish va Vercel production deploy.
 
 ---
 
@@ -41,7 +127,7 @@ flowchart TD
         CatalogAPI["/api/products?store=..."]
         OrderAPI["/api/orders (Tranzaksiya & Qabul)"]
         TGWebhook["/api/telegram-webhook (Callback buttons)"]
-        MerchantAPI["/api/merchant/* (Auth: JWT / Supabase Auth)"]
+        MerchantAPI["/api/merchant/* (Auth: JWT / Session)"]
         SuperAdminAPI["/api/super-admin/* (Auth: Super Admin Secret)"]
     end
 
@@ -99,8 +185,6 @@ flowchart TD
 
 ## 4. MA’LUMOTLAR BAZASI SXEMASI (SUPABASE POSTGRESQL DDL)
 
-Mavjud `schema.sql` quyidagi professional multi-tenant sxema bilan kengaytiriladi:
-
 ```sql
 -- 1. EXTENSIONS
 create extension if not exists "uuid-ossp";
@@ -111,7 +195,7 @@ create table if not exists public.stores (
   id text primary key,                        -- Masalan: 'safari-kids', 'ali-toys' (slug)
   name text not null,                         -- Do'kon nomi: "Safari Kids Wear"
   owner_phone text not null,                  -- Tadbirkor telefoni
-  owner_password_hash text not null,          -- Parol heshi (argon2 / bcrypt / pgcrypto)
+  owner_password_hash text not null,          -- Parol heshi
   custom_domain text unique,                  -- Ixtiyoriy shaxsiy domen: "safarikids.uz"
   logo_url text default '/images/look-safari.webp',
   theme_color text default '#285ae8',         -- Do'konning asosiy rangi
@@ -164,8 +248,8 @@ create table if not exists public.orders (
   language text not null default 'uz' check (language in ('uz', 'ru')),
   total integer not null check (total >= 0),
   status text not null default 'new' check (status in ('new', 'confirmed', 'packing', 'sent', 'completed', 'cancelled')),
-  telegram_message_id text,                   -- Telegram guruhidagi post ID si (statusni edit qilish uchun)
-  accepted_by text,                           -- Buyurtmani qabul qilgan operator nomi/ID
+  telegram_message_id text,                   -- Telegram guruhidagi post ID si
+  accepted_by text,                           -- Qabul qilgan operator
   created_at timestamptz not null default now()
 );
 
@@ -203,7 +287,6 @@ alter table public.orders enable row level security;
 alter table public.order_items enable row level security;
 alter table public.subscribers enable row level security;
 
--- Faqat serverless backend (service_role) to'g'ridan-to'g'ri yozadi
 revoke all on public.stores, public.products, public.orders, public.order_items, public.subscribers from public, anon, authenticated;
 grant all on public.stores, public.products, public.orders, public.order_items, public.subscribers to service_role;
 ```
@@ -317,7 +400,7 @@ Xabarning ostida Telegram tugmalari bo‘ladi:
 ## 8. XAVFSIZLIK VA ISHONCHLILIK TALABLARI (NON-FUNCTIONAL)
 
 1. **Tenant Isolation (IDOR himoyasi):**  
-   Har qanday API so‘rovida (`/api/merchant/orders`) sessiyadagi `store_id` bilan so‘ralayotgan obyektning `store_id`si mos kelishi qat’iy tekshiriladi. Bitta do‘kon ikkinchisining ma’lumotini aslo ololmaydi.
+   Har qanday API so‘rovida sessiyadagi `store_id` bilan so‘ralayotgan obyektning `store_id`si mos kelishi qat’iy tekshiriladi. Bitta do‘kon ikkinchisining ma’lumotini aslo ololmaydi.
 2. **Iframe & CSP Security:**  
    `vercel.json`dagi `X-Frame-Options: DENY` o‘rniga zamonaviy xavfsizlik standarti o‘rnatiladi:
    ```json
@@ -330,43 +413,3 @@ Xabarning ostida Telegram tugmalari bo‘ladi:
    Bir vaqtda bir nechta buyurtma tushganda tovar soni minusga ketmasligi uchun PostgreSQL `FOR UPDATE` qulflash mexanizmi to‘liq saqlanadi.
 4. **Retry Queue (Telegram nosozligiga qarshi):**  
    Agar Telegram API vaqtincha javob bermasa, buyurtma bazada `telegram_status = 'pending'` bo‘lib saqlanadi va fon xizmati orqali 3 marta qayta jo‘natiladi.
-
----
-
-## 9. AMALGA OSHIRISH BOSQICHLARI (SPRINT ROADMAP)
-
-```
-[SPRINT 1: Baza va Multi-Tenant Backend (1-2 kun)]
-├── 1.1. Supabase'da yangi 'stores' jadvalini va FK'larni yaratish
-├── 1.2. API'larni store_id bo'yicha ishlashga moslashtirish (/api/products, /api/orders)
-└── 1.3. vercel.json'dagi CSP frame-ancestors sozlamasini kiritish
-
-[SPRINT 2: Super Admin Dashboard (1-2 kun)]
-├── 2.1. Super Admin autentifikatsiyasi
-├── 2.2. Do'kon yaratish va boshqarish CRUD interfeysi
-└── 2.3. Do'konlarga subdomen va Mini App linkini avtomatik biriktirish
-
-[SPRINT 3: Tadbirkor Paneli va Do'kon Sozlamalari (2 kun)]
-├── 3.1. Har bir do'kon egasi uchun shaxsiy login/parol tizimi
-├── 3.2. Rang va razmerlarni tovarlarga biriktirish boshqaruvi
-└── 3.3. Savdo tushumi analitikasi va buyurtmalar filtrlari
-
-[SPRINT 4: Telegram Webhook va Interaktiv Tugmalar (1-2 kun)]
-├── 4.1. Telegram buyurtma xabariga inline tugmalar ulash
-└── 4.2. /api/telegram-webhook orqali statusni Telegramdan turib o'zgartirish
-
-[SPRINT 5: Sinovlar va Ishga Tushirish (1 kun)]
-├── 5.1. 2 ta alohida do'kon (Do'kon A va B) ochib to'liq mustaqillikni sinash
-└── 5.2. Production deployment va foydalanishga topshirish
-```
-
----
-
-## 10. QABUL QILISH MEZONLARI (DEFINITION OF DONE)
-
-- [ ] Super Admin paneldan yangi tadbirkor qo‘shilganda, unga avtomatik shaxsiy sayt linki va Mini App linki berilishi;
-- [ ] 1-do‘konga berilgan buyurtma faqat 1-do‘konning Telegram guruhiga va admin paneliga tushishi;
-- [ ] 2-do‘kon admini 1-do‘konning tovarlari va xaridorlarini ko‘ra olmasligi;
-- [ ] Mini App Telegram Web va mobil ilovasida xatosiz ochilishi;
-- [ ] Xaridor rang va razmerni tanlab buyurtma berganda, ushbu ma’lumotlar Telegram xabarida aniq ko‘rinishi;
-- [ ] Kelajakda frontend dizayni o‘zgarganda backend va bazaga ta’sir qilmasligi.
