@@ -804,6 +804,11 @@
       if (telegramMiniAppLink) {
         telegramMiniAppLink.value = `https://t.me/kids_shbot?startapp=${s.id}`;
       }
+      const storeWebUrlInput = $("#storeWebUrlInput");
+      if (storeWebUrlInput) {
+        const domainUrl = s.custom_domain ? `https://${s.custom_domain}/` : `${window.location.origin}/?store=${s.id}`;
+        storeWebUrlInput.value = domainUrl;
+      }
 
       state.categories = Array.isArray(s.categories) && s.categories.length ? s.categories : [...DEFAULT_CATEGORIES];
       renderCategoriesList();

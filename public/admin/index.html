@@ -226,12 +226,19 @@
 
               <!-- Mini App Deep Link Section -->
               <div class="mini-app-share-box">
-                <div class="mini-app-label">🚀 Sizning Telegram Mini App havolangiz:</div>
+                <div class="mini-app-label">🌐 1-Variant: Veb-Sayt & @BotFather Menyu havolangiz:</div>
+                <div class="copy-input-group" style="margin-bottom: 0.5rem;">
+                  <input type="text" id="storeWebUrlInput" class="form-input font-mono" readonly value="" />
+                  <button type="button" id="btnCopyWebUrl" class="btn-outline-sm" title="Nusxalash">📋 Nusxa olish</button>
+                </div>
+                <small class="form-hint" style="display:block; margin-bottom: 1rem;">O‘zingiz ochgan Telegram botning <b>/setmenubutton</b> qismiga aynan shu havolani qo‘yasiz.</small>
+
+                <div class="mini-app-label">📱 2-Variant: To‘g‘ridan-to‘g‘ri Telegram Mini App havolangiz:</div>
                 <div class="copy-input-group">
                   <input type="text" id="telegramMiniAppLink" class="form-input font-mono" readonly value="" />
                   <button type="button" id="btnCopyMiniAppLink" class="btn-outline-sm" title="Nusxalash">📋 Nusxa olish</button>
                 </div>
-                <small class="form-hint">Ushbu havolani kanalingizga, bot menyusiga yoki Instagram biosiga joylashtiring. Mijozlar to'g'ridan-to'g'ri sizning vitrinangizga kirishadi.</small>
+                <small class="form-hint">Ushbu havolani Instagram, Telegram kanal va postlarga qo‘ysangiz, mijozlar bir zumda do‘koningizga kirishadi.</small>
               </div>
 
               <form id="telegramSettingsForm" class="settings-form">
@@ -461,6 +468,6 @@
   <!-- Toast Container -->
   <div id="toastContainer" class="toast-container" aria-live="polite"></div>
 
-  <script src="/admin/admin.js"></script>
+  <script src="/admin/admin.js?v=2"></script>
 </body>
 </html>

@@ -34,9 +34,17 @@ module.exports = async function handler(req, res) {
     return res.status(405).json({ error: "method_not_allowed" });
   }
 
-  // Multi-tenant resolution: ?store=slug
-  const rawStore = req.query.store || req.query.store_id || "kids-shop";
-  const storeId = String(rawStore).toLowerCase().replace(/[^a-z0-9-]/g, "").slice(0, 64) || "kids-shop";
+  // Multi-tenant resolution: ?store=slug OR custom domain / subdomain from host header
+  const host = String(req.headers["x-forwarded-host"] || req.headers.host || "").toLowerCase().split(":")[0];
+  let rawStore = req.query.store || req.query.store_id || "";
+  
+  if (!rawStore && host && !["localhost", "127.0.0.1"].includes(host) && !host.endsWith(".vercel.app")) {
+    const parts = host.split(".");
+    if (parts.length >= 3 && parts[0] !== "www") {
+      rawStore = parts[0];
+    }
+  }
+  const storeId = String(rawStore || "kids-shop").toLowerCase().replace(/[^a-z0-9-]/g, "").slice(0, 64) || "kids-shop";
 
   const { url, key } = getSupabaseConfig();
   if (!url || !key) {
@@ -75,16 +83,17 @@ module.exports = async function handler(req, res) {
         const storeRows = await storeRes.json();
         if (storeRows && storeRows.length) {
           const row = storeRows[0];
+          const isKids = row.id === "kids-shop";
           storeInfo = {
             ...storeInfo,
             ...row,
-            hero_title: row.hero_title || DEFAULT_STOREFRONT.hero_title,
-            hero_subtitle: row.hero_subtitle || DEFAULT_STOREFRONT.hero_subtitle,
+            hero_title: row.hero_title || (isKids ? DEFAULT_STOREFRONT.hero_title : `${row.name}\nOnlayn Do‘koni`),
+            hero_subtitle: row.hero_subtitle || (isKids ? DEFAULT_STOREFRONT.hero_subtitle : "Sifatli mahsulotlar va tezkor yetkazib berish xizmati. Bizning do‘kondan qulay xarid qiling!"),
             hero_image_url: row.hero_image_url || DEFAULT_STOREFRONT.hero_image_url,
-            banner_cta_text: row.banner_cta_text || DEFAULT_STOREFRONT.banner_cta_text,
-            announcement_text: row.announcement_text || DEFAULT_STOREFRONT.announcement_text,
-            contact_phone: row.contact_phone || DEFAULT_STOREFRONT.contact_phone,
-            contact_telegram: row.contact_telegram || DEFAULT_STOREFRONT.contact_telegram,
+            banner_cta_text: row.banner_cta_text || (isKids ? DEFAULT_STOREFRONT.banner_cta_text : "Xarid qilish"),
+            announcement_text: row.announcement_text || (isKids ? DEFAULT_STOREFRONT.announcement_text : `${row.name} onlayn do‘koniga xush kelibsiz!`),
+            contact_phone: row.contact_phone || (isKids ? DEFAULT_STOREFRONT.contact_phone : ""),
+            contact_telegram: row.contact_telegram || (isKids ? DEFAULT_STOREFRONT.contact_telegram : ""),
             categories: Array.isArray(row.categories) && row.categories.length ? row.categories : DEFAULT_STOREFRONT.categories
           };
           if (storeInfo.status !== "active") {
