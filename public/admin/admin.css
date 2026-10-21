@@ -1033,3 +1033,119 @@ body.merchant-body {
   color: var(--text-dim);
   font-size: 13px;
 }
+
+/* ==============================================================================
+   9. STOREFRONT CUSTOMIZATION & TELEGRAM MINI APP
+   ============================================================================== */
+.mini-app-share-box {
+  background: rgba(40, 90, 232, 0.08);
+  border: 1px solid rgba(40, 90, 232, 0.35);
+  border-radius: var(--radius-md);
+  padding: 16px;
+  margin-bottom: 20px;
+}
+
+.mini-app-label {
+  font-size: 13px;
+  font-weight: 700;
+  color: #60a5fa;
+  margin-bottom: 8px;
+}
+
+.copy-input-group {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.copy-input-group .form-input {
+  flex: 1;
+  background: rgba(10, 14, 24, 0.8);
+  font-size: 13px;
+  color: #93c5fd;
+}
+
+.copy-input-group button {
+  white-space: nowrap;
+}
+
+/* Custom Categories Manager */
+.categories-list-box {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 16px;
+  max-height: 240px;
+  overflow-y: auto;
+}
+
+.category-item-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 8px 12px;
+  gap: 10px;
+}
+
+.category-item-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1;
+}
+
+.category-item-id {
+  font-family: ui-monospace, monospace;
+  font-size: 11px;
+  color: var(--text-dim);
+  background: rgba(255, 255, 255, 0.05);
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.category-item-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-main);
+}
+
+.category-item-sub {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.btn-delete-cat {
+  background: transparent;
+  border: none;
+  color: var(--text-dim);
+  font-size: 14px;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 4px;
+}
+
+.btn-delete-cat:hover {
+  color: var(--color-rose);
+  background: rgba(239, 68, 68, 0.1);
+}
+
+.add-cat-inline-form {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px dashed var(--border);
+  border-radius: var(--radius-sm);
+  padding: 12px;
+}
+
+.settings-col-right {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.mb-4 { margin-bottom: 16px; }
+.mt-2 { margin-top: 8px; }
+.mt-3 { margin-top: 12px; }
+.mt-4 { margin-top: 16px; }

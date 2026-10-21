@@ -11,6 +11,22 @@ const demo = [
 
 const { getSupabaseConfig, supabaseHeaders } = require("./_supabase");
 
+const DEFAULT_STOREFRONT = {
+  hero_title: "Kichik qadamlar,\nkatta sarguzashtlar.",
+  hero_subtitle: "Har kun uchun qulay, bolalik uchun esa unutilmas kiyimlar. Kichkintoyingiz erkin harakat qilsin, uslubi esa o‘ziga xos bo‘lsin.",
+  hero_image_url: "/images/look-safari.webp",
+  banner_cta_text: "Xaridni boshlash",
+  announcement_text: "Yangi kolleksiya — 2026",
+  contact_phone: "+998900000000",
+  contact_telegram: "",
+  categories: [
+    { id: "all", name_uz: "Barchasi", name_ru: "Все" },
+    { id: "boys", name_uz: "O‘g‘il bolalar", name_ru: "Для мальчиков" },
+    { id: "girls", name_uz: "Qiz bolalar", name_ru: "Для девочек" },
+    { id: "sets", name_uz: "To‘plamlar", name_ru: "Комплекты" }
+  ]
+};
+
 module.exports = async function handler(req, res) {
   res.setHeader("Cache-Control", "s-maxage=60, stale-while-revalidate=300");
   if (req.method !== "GET") {
@@ -23,19 +39,54 @@ module.exports = async function handler(req, res) {
   const storeId = String(rawStore).toLowerCase().replace(/[^a-z0-9-]/g, "").slice(0, 64) || "kids-shop";
 
   const { url, key } = getSupabaseConfig();
-  if (!url || !key) return res.status(200).json({ store: { id: "kids-shop", name: "KIDS-SHOP" }, products: demo, source: "demo" });
+  if (!url || !key) {
+    return res.status(200).json({
+      store: { id: "kids-shop", name: "KIDS-SHOP", logo_url: "/images/look-safari.webp", theme_color: "#285ae8", status: "active", plan: "pro", ...DEFAULT_STOREFRONT },
+      products: demo,
+      source: "demo"
+    });
+  }
 
   try {
     // 1. Do'kon sozlamalari va holatini tekshirish
-    let storeInfo = { id: storeId, name: storeId === "kids-shop" ? "KIDS-SHOP" : storeId, status: "active" };
+    let storeInfo = {
+      id: storeId,
+      name: storeId === "kids-shop" ? "KIDS-SHOP" : storeId,
+      status: "active",
+      logo_url: "/images/look-safari.webp",
+      theme_color: "#285ae8",
+      ...DEFAULT_STOREFRONT
+    };
+
     try {
-      const storeRes = await fetch(new URL(`/rest/v1/stores?id=eq.${encodeURIComponent(storeId)}&select=id,name,logo_url,theme_color,status,plan`, url), {
+      const selectFields = "id,name,logo_url,theme_color,status,plan,hero_title,hero_subtitle,hero_image_url,banner_cta_text,announcement_text,contact_phone,contact_telegram,categories";
+      let storeRes = await fetch(new URL(`/rest/v1/stores?id=eq.${encodeURIComponent(storeId)}&select=${selectFields}`, url), {
         headers: supabaseHeaders(key),
       });
+
+      // Agar yangi ustunlar hali migratsiya qilinmagan bo'lsa, asosiy ustunlar bilan qayta so'rash
+      if (!storeRes.ok) {
+        storeRes = await fetch(new URL(`/rest/v1/stores?id=eq.${encodeURIComponent(storeId)}&select=id,name,logo_url,theme_color,status,plan`, url), {
+          headers: supabaseHeaders(key),
+        });
+      }
+
       if (storeRes.ok) {
         const storeRows = await storeRes.json();
         if (storeRows && storeRows.length) {
-          storeInfo = storeRows[0];
+          const row = storeRows[0];
+          storeInfo = {
+            ...storeInfo,
+            ...row,
+            hero_title: row.hero_title || DEFAULT_STOREFRONT.hero_title,
+            hero_subtitle: row.hero_subtitle || DEFAULT_STOREFRONT.hero_subtitle,
+            hero_image_url: row.hero_image_url || DEFAULT_STOREFRONT.hero_image_url,
+            banner_cta_text: row.banner_cta_text || DEFAULT_STOREFRONT.banner_cta_text,
+            announcement_text: row.announcement_text || DEFAULT_STOREFRONT.announcement_text,
+            contact_phone: row.contact_phone || DEFAULT_STOREFRONT.contact_phone,
+            contact_telegram: row.contact_telegram || DEFAULT_STOREFRONT.contact_telegram,
+            categories: Array.isArray(row.categories) && row.categories.length ? row.categories : DEFAULT_STOREFRONT.categories
+          };
           if (storeInfo.status !== "active") {
             return res.status(403).json({ error: "store_suspended", store: storeInfo });
           }

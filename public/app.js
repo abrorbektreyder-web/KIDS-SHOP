@@ -93,7 +93,8 @@ const state={
   selectedProduct:null,
   selectedSize:"",
   selectedColor:"",
-  drawerOpen:false
+  drawerOpen:false,
+  customStore:null
 };
 
 const $=(sel,root=document)=>root.querySelector(sel);
@@ -120,6 +121,7 @@ function setLanguage(lang){
     else el.textContent=val;
   });
   $("#searchInput").placeholder=t("searchPlaceholder");
+  if(state.customStore) applyStoreCustomization(state.customStore);
   renderProducts();
   if(state.drawerOpen)renderDrawer();
 }
@@ -641,30 +643,130 @@ renderProducts();
 
 fetch("/api/products?store=" + encodeURIComponent(currentStoreSlug)).then(r=>r.ok?r.json():Promise.reject()).then(data=>{
   if(data&&data.store){
-    if(data.store.name){
-      document.title=data.store.name;
-      const brandLogo=document.querySelector(".brand-name")||document.querySelector(".nav-logo");
-      if(brandLogo)brandLogo.textContent=data.store.name;
-    }
-    if(data.store.theme_color){
-      document.documentElement.style.setProperty("--color-brand",data.store.theme_color);
-    }
+    state.customStore = data.store;
+    applyStoreCustomization(data.store);
   }
   if(Array.isArray(data.products)&&data.products.length){
     PRODUCTS.splice(0,PRODUCTS.length,...data.products);
     renderProducts();
+    if(state.customStore?.categories) {
+      renderDynamicFilterPills(state.customStore.categories);
+    }
   }
 }).catch(()=>{});
+
+function applyStoreCustomization(store) {
+  if (!store) return;
+
+  // 1. Title & Branding
+  if (store.name) {
+    document.title = store.name;
+    const brandWords = document.querySelectorAll(".brand-word, .brand-name, .nav-logo");
+    brandWords.forEach(el => { el.textContent = store.name; });
+    const footerBrand = document.querySelector(".footer-bottom span:first-child");
+    if (footerBrand) footerBrand.textContent = "© 2026 " + store.name;
+  }
+
+  // 2. Theme Color
+  if (store.theme_color) {
+    document.documentElement.style.setProperty("--color-brand", store.theme_color);
+    document.documentElement.style.setProperty("--color-primary", store.theme_color);
+  }
+
+  // 3. Announcement Ticker
+  if (store.announcement_text) {
+    const announcementEl = document.querySelector(".announcement span[data-i18n='announcement']");
+    if (announcementEl) {
+      announcementEl.removeAttribute("data-i18n");
+      announcementEl.textContent = store.announcement_text;
+    }
+  }
+
+  // 4. Hero Title (supports newlines)
+  if (store.hero_title) {
+    const heroTitleEl = document.querySelector("h1[data-i18n='heroTitle']");
+    if (heroTitleEl) {
+      heroTitleEl.removeAttribute("data-i18n");
+      heroTitleEl.innerHTML = esc(store.hero_title).replace(/\n/g, "<br />");
+    }
+  }
+
+  // 5. Hero Subtitle
+  if (store.hero_subtitle) {
+    const heroSubEl = document.querySelector("p[data-i18n='heroText']");
+    if (heroSubEl) {
+      heroSubEl.removeAttribute("data-i18n");
+      heroSubEl.textContent = store.hero_subtitle;
+    }
+  }
+
+  // 6. Hero Image
+  if (store.hero_image_url) {
+    const heroImgEl = document.querySelector(".hero-photo img");
+    if (heroImgEl) {
+      heroImgEl.src = safeImage(store.hero_image_url);
+    }
+  }
+
+  // 7. Banner CTA Button Text
+  if (store.banner_cta_text) {
+    const heroBtnSpan = document.querySelector(".hero-buttons .button-dark span[data-i18n='shopNow']");
+    if (heroBtnSpan) {
+      heroBtnSpan.removeAttribute("data-i18n");
+      heroBtnSpan.textContent = store.banner_cta_text;
+    }
+  }
+
+  // 8. Contact Phone
+  if (store.contact_phone) {
+    const phoneClean = store.contact_phone.replace(/[^0-9+]/g, "");
+    const supportTextEl = document.querySelector("#delivery [data-i18n='supportText']");
+    if (supportTextEl) {
+      supportTextEl.removeAttribute("data-i18n");
+      supportTextEl.innerHTML = '<a href="tel:' + phoneClean + '" style="color:inherit;text-decoration:underline;">' + esc(store.contact_phone) + '</a>';
+    }
+  }
+
+  // 9. Telegram Links & Mini App
+  const tgMiniAppUrl = "https://t.me/kids_shbot?startapp=" + encodeURIComponent(currentStoreSlug);
+  const tgContactUrl = store.contact_telegram 
+    ? (store.contact_telegram.startsWith("http") ? store.contact_telegram : "https://t.me/" + store.contact_telegram.replace(/^@/, ""))
+    : tgMiniAppUrl;
+
+  const tgLinks = document.querySelectorAll("a[href*='telegram-launch'], a.telegram-link, .socials a");
+  tgLinks.forEach(link => {
+    link.href = tgContactUrl;
+  });
+
+  // 10. Custom Categories Filter Pills
+  if (Array.isArray(store.categories) && store.categories.length) {
+    renderDynamicFilterPills(store.categories);
+  }
+}
+
+function renderDynamicFilterPills(categories) {
+  const container = document.querySelector(".filter-pills");
+  if (!container || !categories || !categories.length) return;
+  const count = PRODUCTS.length;
+  container.innerHTML = categories.map(cat => {
+    const isActive = state.filter === cat.id;
+    const label = state.lang === "ru" ? (cat.name_ru || cat.name_uz) : cat.name_uz;
+    const isSale = cat.id === "sale";
+    return '<button class="filter-chip ' + (isActive ? 'active' : '') + ' ' + (isSale ? 'sale-chip' : '') + '" data-filter="' + esc(cat.id) + '">' + esc(label) + (cat.id === 'all' ? ' <span>' + String(count).padStart(2, '0') + '</span>' : '') + '</button>';
+  }).join("");
+}
 
 function esc(value){
   return String(value??"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/\"/g,"&quot;").replace(/'/g,"&#39;");
 }
 function safeImage(value){
-  const url=String(value||"");
+  const url=String(value||"").trim();
+  if(!url) return "/images/look-safari.webp";
+  if(url.startsWith("data:image/")) return url;
   if(/^\/images\/[A-Za-z0-9_-]+\.(?:webp|png|jpe?g)$/i.test(url)){
     return url.replace(/\/(kids-fashion-campaign|look-adventure|look-safari)\.png$/i,"/$1.webp");
   }
-  if(/^https:\/\/[a-z0-9-]+\.supabase\.co\/storage\/v1\/object\/public\/product-images\/[a-f0-9-]+\.(?:webp|png|jpe?g)$/i.test(url))return url;
+  if(/^https?:\/\/[^\s$.?#].[^\s]*$/i.test(url)) return url;
   return "/images/look-safari.webp";
 }
 function safeColor(value){

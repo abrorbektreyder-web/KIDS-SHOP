@@ -12,8 +12,8 @@
 ## 📌 JORIY HOLAT VA BAJARILGAN ISHLAR STATISTIKASI
 
 ```
-[=========================================================>-] 96% Bajarildi
-Umumiy vazifalar: 28 ta | Bajarildi: 27 ta | Qoldi: 1 ta
+[=========================================================>-] 97% Bajarildi
+Umumiy vazifalar: 29 ta | Bajarildi: 28 ta | Qoldi: 1 ta (Sprint 4-5)
 ```
 
 | Faza / Yo‘nalish | Holati | Mas’ul |
@@ -74,6 +74,7 @@ Har bir vazifa bajarilgach, ushbu ro‘yxatda `[ ]` belgisi `[x]` ga o‘zgartir
 - [x] **TASK-305:** Do‘konning shaxsiy buyurtmalar ro‘yxati va holatlarni yangilash (Yangi -> Tasdiqlandi -> Jo‘natildi -> Yetkazildi).
 - [x] **TASK-306:** Telegram integratsiyasi sozlamalari (Guruh ID sini kiritish va "Sinov xabari yuborish" tugmasi).
 - [x] **TASK-307:** Kassa va tushum hisoboti (Kunlik, haftalik, oylik tushum va Top sotilgan tovarlar).
+- [x] **TASK-308:** Vitrina va brendingni moslashtirish (Dynamic Storefront Customization): Bosh banner sarlavhasi (Hero Title), tavsifi (Hero Subtitle), banner rasmi, tugma matni, e'lonlar satri (Ticker), aloqa telefoni, telegram, Telegram Mini App deep linkini nusxalash (`t.me/Bot?startapp=slug`) va maxsus tovar kategoriyalari (Custom Categories CRUD).
 
 ---
 

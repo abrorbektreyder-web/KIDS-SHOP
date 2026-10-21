@@ -51,12 +51,20 @@
     return "kids-shop";
   }
 
+  const DEFAULT_CATEGORIES = [
+    { id: "all", name_uz: "Barchasi", name_ru: "Все" },
+    { id: "boys", name_uz: "O‘g‘il bolalar", name_ru: "Для мальчиков" },
+    { id: "girls", name_uz: "Qiz bolalar", name_ru: "Для девочек" },
+    { id: "sets", name_uz: "To‘plamlar", name_ru: "Комплекты" }
+  ];
+
   const state = {
     token: sessionStorage.getItem(STORAGE_KEY) || "",
     storeId: resolveStoreSlug(),
     store: null,
     orders: [],
     products: [],
+    categories: [...DEFAULT_CATEGORIES],
     orderFilter: "all",
     orderSearch: "",
     productSearch: "",
@@ -121,6 +129,21 @@
   const settingThemeColor = $("#settingThemeColor");
   const settingThemeColorLabel = $("#settingThemeColorLabel");
   const settingCustomDomain = $("#settingCustomDomain");
+  const settingAnnouncementText = $("#settingAnnouncementText");
+  const settingHeroTitle = $("#settingHeroTitle");
+  const settingHeroSubtitle = $("#settingHeroSubtitle");
+  const settingHeroImageUrl = $("#settingHeroImageUrl");
+  const settingBannerCtaText = $("#settingBannerCtaText");
+  const settingContactPhone = $("#settingContactPhone");
+  const settingContactTelegram = $("#settingContactTelegram");
+  const telegramMiniAppLink = $("#telegramMiniAppLink");
+  const btnCopyMiniAppLink = $("#btnCopyMiniAppLink");
+  const customCategoriesList = $("#customCategoriesList");
+  const newCatId = $("#newCatId");
+  const newCatNameUz = $("#newCatNameUz");
+  const newCatNameRu = $("#newCatNameRu");
+  const btnAddCategory = $("#btnAddCategory");
+  const btnSaveCategories = $("#btnSaveCategories");
   const telegramSettingsForm = $("#telegramSettingsForm");
   const settingTelegramChatId = $("#settingTelegramChatId");
   const btnTestTelegram = $("#btnTestTelegram");
@@ -714,8 +737,43 @@
   });
 
   // ==========================================================================
-  // SETTINGS & TELEGRAM INTEGRATION (TAB 3)
+  // SETTINGS, VITRINA & TELEGRAM INTEGRATION (TAB 3)
   // ==========================================================================
+  function renderCategoriesList() {
+    if (!customCategoriesList) return;
+    if (!state.categories || !state.categories.length) {
+      customCategoriesList.innerHTML = `<div class="empty-state">Hali maxsus kategoriya qo'shilmagan</div>`;
+      return;
+    }
+    customCategoriesList.innerHTML = state.categories.map((c, index) => {
+      const isAll = c.id === "all";
+      return `
+        <div class="category-item-row" data-index="${index}">
+          <div class="category-item-info">
+            <span class="category-item-id">${escapeHtml(c.id)}</span>
+            <div>
+              <div class="category-item-name">${escapeHtml(c.name_uz || c.name || "")}</div>
+              ${c.name_ru ? `<div class="category-item-sub">${escapeHtml(c.name_ru)}</div>` : ""}
+            </div>
+          </div>
+          ${!isAll ? `<button type="button" class="btn-delete-cat" data-action="delete-cat" data-id="${escapeHtml(c.id)}" title="O‘chirish">✕</button>` : `<span class="category-item-sub">Asosiy</span>`}
+        </div>
+      `;
+    }).join("");
+  }
+
+  function updateProductModalCategories() {
+    const prodCategorySelect = $("#prodCategory");
+    if (!prodCategorySelect) return;
+    const cats = (state.categories || []).filter(c => c.id !== "all");
+    if (!cats.length) return;
+    const currentVal = prodCategorySelect.value;
+    prodCategorySelect.innerHTML = cats.map(c => `<option value="${escapeHtml(c.id)}">${escapeHtml(c.name_uz || c.name || c.id)}</option>`).join("");
+    if (cats.some(c => c.id === currentVal)) {
+      prodCategorySelect.value = currentVal;
+    }
+  }
+
   async function loadSettings() {
     try {
       const res = await apiFetch("/api/merchant/settings");
@@ -726,38 +784,135 @@
       state.store = s;
       updateTopbarBranding();
 
-      settingStoreName.value = s.name || "";
-      settingThemeColor.value = s.theme_color || "#285ae8";
-      settingThemeColorLabel.textContent = s.theme_color || "#285ae8";
-      settingCustomDomain.value = s.custom_domain || "";
-      settingTelegramChatId.value = s.telegram_chat_id || "";
+      if (settingStoreName) settingStoreName.value = s.name || "";
+      if (settingThemeColor) {
+        settingThemeColor.value = s.theme_color || "#285ae8";
+        settingThemeColorLabel.textContent = s.theme_color || "#285ae8";
+      }
+      if (settingAnnouncementText) settingAnnouncementText.value = s.announcement_text || "";
+      if (settingHeroTitle) settingHeroTitle.value = s.hero_title || "";
+      if (settingHeroSubtitle) settingHeroSubtitle.value = s.hero_subtitle || "";
+      if (settingHeroImageUrl) settingHeroImageUrl.value = s.hero_image_url || "";
+      if (settingBannerCtaText) settingBannerCtaText.value = s.banner_cta_text || "";
+      if (settingContactPhone) settingContactPhone.value = s.contact_phone || "";
+      if (settingContactTelegram) settingContactTelegram.value = s.contact_telegram || "";
+      if (settingCustomDomain) settingCustomDomain.value = s.custom_domain || "";
+      if (settingTelegramChatId) settingTelegramChatId.value = s.telegram_chat_id || "";
+
+      if (telegramMiniAppLink) {
+        telegramMiniAppLink.value = `https://t.me/kids_shbot?startapp=${s.id}`;
+      }
+
+      state.categories = Array.isArray(s.categories) && s.categories.length ? s.categories : [...DEFAULT_CATEGORIES];
+      renderCategoriesList();
+      updateProductModalCategories();
     } catch {}
   }
 
-  settingThemeColor.addEventListener("input", (e) => {
-    settingThemeColorLabel.textContent = e.target.value;
-  });
+  if (settingThemeColor) {
+    settingThemeColor.addEventListener("input", (e) => {
+      settingThemeColorLabel.textContent = e.target.value;
+    });
+  }
 
-  storeSettingsForm.addEventListener("submit", async (e) => {
-    e.preventDefault();
-    $("#btnSaveStoreSettings").disabled = true;
-    try {
-      const res = await apiFetch("/api/merchant/settings", {
-        method: "PATCH",
-        body: JSON.stringify({
+  if (storeSettingsForm) {
+    storeSettingsForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      $("#btnSaveStoreSettings").disabled = true;
+      try {
+        const payload = {
           name: settingStoreName.value.trim(),
           theme_color: settingThemeColor.value,
-        }),
-      });
-      if (!res.ok) throw new Error("Saqlashda xatolik");
-      showToast("Do‘kon sozlamalari saqlandi!", "success");
-      loadSettings();
-    } catch (err) {
-      showToast(err.message, "error");
-    } finally {
-      $("#btnSaveStoreSettings").disabled = false;
-    }
-  });
+          announcement_text: settingAnnouncementText ? settingAnnouncementText.value.trim() : undefined,
+          hero_title: settingHeroTitle ? settingHeroTitle.value.trim() : undefined,
+          hero_subtitle: settingHeroSubtitle ? settingHeroSubtitle.value.trim() : undefined,
+          hero_image_url: settingHeroImageUrl ? settingHeroImageUrl.value.trim() : undefined,
+          banner_cta_text: settingBannerCtaText ? settingBannerCtaText.value.trim() : undefined,
+          contact_phone: settingContactPhone ? settingContactPhone.value.trim() : undefined,
+          contact_telegram: settingContactTelegram ? settingContactTelegram.value.trim() : undefined,
+          custom_domain: settingCustomDomain ? (settingCustomDomain.value.trim() || null) : undefined,
+        };
+        const res = await apiFetch("/api/merchant/settings", {
+          method: "PATCH",
+          body: JSON.stringify(payload),
+        });
+        if (!res.ok) throw new Error("Saqlashda xatolik");
+        showToast("Do‘kon va vitrina sozlamalari saqlandi!", "success");
+        loadSettings();
+      } catch (err) {
+        showToast(err.message, "error");
+      } finally {
+        $("#btnSaveStoreSettings").disabled = false;
+      }
+    });
+  }
+
+  if (btnCopyMiniAppLink) {
+    btnCopyMiniAppLink.addEventListener("click", async () => {
+      if (!telegramMiniAppLink || !telegramMiniAppLink.value) return;
+      try {
+        await navigator.clipboard.writeText(telegramMiniAppLink.value);
+        showToast("✅ Telegram Mini App havolasi nusxalandi!", "success");
+      } catch {
+        telegramMiniAppLink.select();
+        document.execCommand("copy");
+        showToast("✅ Havola nusxalandi!", "success");
+      }
+    });
+  }
+
+  if (btnAddCategory) {
+    btnAddCategory.addEventListener("click", () => {
+      const id = (newCatId.value || "").trim().toLowerCase().replace(/[^a-z0-9_-]/g, "");
+      const nameUz = (newCatNameUz.value || "").trim();
+      const nameRu = (newCatNameRu.value || "").trim();
+      if (!id || !nameUz) {
+        showToast("Kategoriya ID va O‘zbekcha nomini kiriting!", "error");
+        return;
+      }
+      if (state.categories.some(c => c.id === id)) {
+        showToast("Bu ID ga ega kategoriya allaqachon mavjud!", "error");
+        return;
+      }
+      state.categories.push({ id, name_uz: nameUz, name_ru: nameRu || nameUz });
+      newCatId.value = "";
+      newCatNameUz.value = "";
+      newCatNameRu.value = "";
+      renderCategoriesList();
+      updateProductModalCategories();
+    });
+  }
+
+  if (customCategoriesList) {
+    customCategoriesList.addEventListener("click", (e) => {
+      const btn = e.target.closest("[data-action='delete-cat']");
+      if (!btn) return;
+      const catId = btn.dataset.id;
+      if (catId === "all") return;
+      state.categories = state.categories.filter(c => c.id !== catId);
+      renderCategoriesList();
+      updateProductModalCategories();
+    });
+  }
+
+  if (btnSaveCategories) {
+    btnSaveCategories.addEventListener("click", async () => {
+      btnSaveCategories.disabled = true;
+      try {
+        const res = await apiFetch("/api/merchant/settings", {
+          method: "PATCH",
+          body: JSON.stringify({ categories: state.categories }),
+        });
+        if (!res.ok) throw new Error("Kategoriyalarni saqlashda xatolik");
+        showToast("✅ Kategoriyalar muvaffaqiyatli saqlandi!", "success");
+        loadSettings();
+      } catch (err) {
+        showToast(err.message, "error");
+      } finally {
+        btnSaveCategories.disabled = false;
+      }
+    });
+  }
 
   telegramSettingsForm.addEventListener("submit", async (e) => {
     e.preventDefault();

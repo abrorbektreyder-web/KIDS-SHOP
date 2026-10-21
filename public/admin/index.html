@@ -148,15 +148,15 @@
       <section id="tabSettings" class="tab-content hidden">
         <div class="settings-grid">
           
-          <!-- Store Profile Card -->
+          <!-- Card 1: Store Profile & Storefront Customization -->
           <div class="settings-card">
-            <h2 class="card-title">🏪 Do‘kon Tafsilotlari</h2>
-            <p class="card-sub">Saytingizning ko‘rinishi va brendingini sozlang</p>
+            <h2 class="card-title">🎨 Vitrina & Bosh Sahifa Sozlamalari</h2>
+            <p class="card-sub">Do‘koningiz nomi, bosh banner, shior va ranglarini o‘z yo‘nalishingizga (poyabzal, kiyim, tekstil va h.k.) moslang</p>
 
             <form id="storeSettingsForm" class="settings-form">
               <div class="form-group">
-                <label class="form-label" for="settingStoreName">Do‘kon Nomi</label>
-                <input type="text" id="settingStoreName" class="form-input" required />
+                <label class="form-label" for="settingStoreName">Do‘kon Nomi *</label>
+                <input type="text" id="settingStoreName" class="form-input" placeholder="masalan: Safari Shoes yoki Kids-Shop" required />
               </div>
 
               <div class="form-group">
@@ -168,9 +168,46 @@
               </div>
 
               <div class="form-group">
-                <label class="form-label">Shaxsiy Domen</label>
-                <input type="text" id="settingCustomDomain" class="form-input" placeholder="masalan: safari.uz (ixtiyoriy)" />
-                <small class="form-hint">Shaxsiy domeningiz bo‘lsa, uni bog‘lash uchun administratorga murojaat qiling.</small>
+                <label class="form-label" for="settingAnnouncementText">Sayt Yuqori E‘lonlar Satri (Ticker)</label>
+                <input type="text" id="settingAnnouncementText" class="form-input" placeholder="🔥 Yangi mavsum kolleksiyasi — Chegirmalar boshlandi!" />
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="settingHeroTitle">Bosh Banner Sarlavhasi (Hero Title)</label>
+                <textarea id="settingHeroTitle" class="form-input" rows="2" placeholder="Sifatli va qulay krossovkalar kolleksiyasi"></textarea>
+                <small class="form-hint">Yangi qatordan yozish mumkin (Enter bosib yangi satrga o'tishingiz mumkin).</small>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="settingHeroSubtitle">Bosh Banner Tavsifi (Hero Subtitle)</label>
+                <textarea id="settingHeroSubtitle" class="form-input" rows="2" placeholder="O‘zbekiston bo‘ylab eng yaxshi narxlarda yetkazib berish. Har bir qadamda ishonch."></textarea>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="settingHeroImageUrl">Bosh Banner Rasmi URL</label>
+                <input type="text" id="settingHeroImageUrl" class="form-input" placeholder="/images/look-safari.webp yoki https://..." />
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="settingBannerCtaText">Banner Tugmasi Matni</label>
+                <input type="text" id="settingBannerCtaText" class="form-input" placeholder="Xaridni boshlash" />
+              </div>
+
+              <div class="form-row-2">
+                <div class="form-group">
+                  <label class="form-label" for="settingContactPhone">Aloqa Telefon Raqami</label>
+                  <input type="text" id="settingContactPhone" class="form-input" placeholder="+998 90 123 45 67" />
+                </div>
+                <div class="form-group">
+                  <label class="form-label" for="settingContactTelegram">Aloqa Telegram (Username)</label>
+                  <input type="text" id="settingContactTelegram" class="form-input" placeholder="safari_admin yoki safari_shop" />
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="settingCustomDomain">Shaxsiy Domen</label>
+                <input type="text" id="settingCustomDomain" class="form-input font-mono" placeholder="masalan: safari-shop.uz (ixtiyoriy)" />
+                <small class="form-hint">Shaxsiy domen ulash uchun do'koningiz CNAME yozuvini yo'naltiring.</small>
               </div>
 
               <button type="submit" id="btnSaveStoreSettings" class="btn-primary">
@@ -179,36 +216,78 @@
             </form>
           </div>
 
-          <!-- Telegram Integration Card -->
-          <div class="settings-card">
-            <h2 class="card-title">📱 Telegram Integratsiyasi</h2>
-            <p class="card-sub">Buyurtmalar tushadigan shaxsiy guruh yoki kanalingizni ulang</p>
+          <!-- Card 2: Right Column with Telegram & Categories -->
+          <div class="settings-col-right">
 
-            <form id="telegramSettingsForm" class="settings-form">
-              <div class="form-group">
-                <label class="form-label" for="settingTelegramChatId">Telegram Guruh/Kanal ID *</label>
-                <input type="text" id="settingTelegramChatId" class="form-input font-mono" placeholder="-1001234567890" required />
-                <small class="form-hint">Guruh ID raqami doim minus bilan boshlanadi: masalan -1001234567890</small>
+            <!-- Telegram Integration & Mini App Links -->
+            <div class="settings-card mb-4">
+              <h2 class="card-title">📱 Telegram Integratsiyasi & Mini App</h2>
+              <p class="card-sub">Buyurtmalar tushadigan guruh va mijozlar kiradigan Mini App havolasi</p>
+
+              <!-- Mini App Deep Link Section -->
+              <div class="mini-app-share-box">
+                <div class="mini-app-label">🚀 Sizning Telegram Mini App havolangiz:</div>
+                <div class="copy-input-group">
+                  <input type="text" id="telegramMiniAppLink" class="form-input font-mono" readonly value="" />
+                  <button type="button" id="btnCopyMiniAppLink" class="btn-outline-sm" title="Nusxalash">📋 Nusxa olish</button>
+                </div>
+                <small class="form-hint">Ushbu havolani kanalingizga, bot menyusiga yoki Instagram biosiga joylashtiring. Mijozlar to'g'ridan-to'g'ri sizning vitrinangizga kirishadi.</small>
               </div>
 
-              <div class="guide-box">
-                <div class="guide-title">💡 3 Qadamda ulash:</div>
-                <ol class="guide-steps">
-                  <li>Telegram guruhingizga <b>@kids_shbot</b> ni a’zo qiling.</li>
-                  <li>Botga guruhda <b>Admin</b> huquqini bering (xabar yoza olishi uchun).</li>
-                  <li>Guruh ID sini bilish uchun <b>@raw_data_bot</b> ni guruhga qo‘shing yoki ID ni bu yerga kiriting.</li>
-                </ol>
+              <form id="telegramSettingsForm" class="settings-form">
+                <div class="form-group">
+                  <label class="form-label" for="settingTelegramChatId">Telegram Guruh/Kanal ID *</label>
+                  <input type="text" id="settingTelegramChatId" class="form-input font-mono" placeholder="-1001234567890" required />
+                  <small class="form-hint">Guruh ID raqami doim minus bilan boshlanadi: masalan -1001234567890</small>
+                </div>
+
+                <div class="guide-box">
+                  <div class="guide-title">💡 3 Qadamda ulash:</div>
+                  <ol class="guide-steps">
+                    <li>Telegram guruhingizga <b>@kids_shbot</b> ni a’zo qiling.</li>
+                    <li>Botga guruhda <b>Admin</b> huquqini bering (xabar yoza olishi uchun).</li>
+                    <li>Guruh ID sini bilish uchun <b>@raw_data_bot</b> ni guruhga qo‘shing yoki ID ni bu yerga kiriting.</li>
+                  </ol>
+                </div>
+
+                <div class="actions-row">
+                  <button type="button" id="btnTestTelegram" class="btn-outline">
+                    <span>⚡ Sinov Xabari Yuborish</span>
+                  </button>
+                  <button type="submit" id="btnSaveTelegramSettings" class="btn-primary">
+                    <span>Saqlash</span>
+                  </button>
+                </div>
+              </form>
+            </div>
+
+            <!-- Custom Categories Manager Card -->
+            <div class="settings-card">
+              <h2 class="card-title">🏷 Mahsulot Kategoriyalari</h2>
+              <p class="card-sub">O‘z sohangizga mos kategoriyalarni boshqaring (Krossovkalar, Tufli, Liboslar va h.k.)</p>
+
+              <!-- Categories List -->
+              <div id="customCategoriesList" class="categories-list-box"></div>
+
+              <!-- Add New Category Form -->
+              <div class="add-cat-inline-form">
+                <div class="form-row-2">
+                  <input type="text" id="newCatId" class="form-input font-mono" placeholder="id (masalan: shoes)" />
+                  <input type="text" id="newCatNameUz" class="form-input" placeholder="Nomi (O‘zbekcha) *" />
+                </div>
+                <div class="form-row-2 mt-2">
+                  <input type="text" id="newCatNameRu" class="form-input" placeholder="Nomi (Ruscha, ixtiyoriy)" />
+                  <button type="button" id="btnAddCategory" class="btn-outline">➕ Kategoriya Qo‘shish</button>
+                </div>
               </div>
 
-              <div class="actions-row">
-                <button type="button" id="btnTestTelegram" class="btn-outline">
-                  <span>⚡ Sinov Xabari Yuborish</span>
+              <div class="actions-row mt-3">
+                <button type="button" id="btnSaveCategories" class="btn-primary">
+                  <span>Kategoriyalarni Saqlash</span>
                 </button>
-                <button type="submit" id="btnSaveTelegramSettings" class="btn-primary">
-                  <span>Saqlash</span>
-                </button>
               </div>
-            </form>
+            </div>
+
           </div>
 
         </div>
