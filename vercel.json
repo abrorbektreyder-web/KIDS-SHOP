@@ -4,6 +4,9 @@
     "api/*.js": { "maxDuration": 10 },
     "api/**/*.js": { "maxDuration": 10 }
   },
+  "rewrites": [
+    { "source": "/api/telegram-launch", "destination": "/api/telegram-webhook?launch=1" }
+  ],
   "headers": [
     {
       "source": "/(.*)",

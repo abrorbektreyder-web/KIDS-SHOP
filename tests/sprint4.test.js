@@ -16,7 +16,8 @@ function mockRes() {
     setHeader(k, v) { this.headers[k] = v; return this; },
     status(code) { this.statusCode = code; return this; },
     json(data) { this.body = data; return this; },
-    redirect(code, url) { this.statusCode = code; this.redirectUrl = url; return this; }
+    redirect(code, url) { this.statusCode = code; this.redirectUrl = url; return this; },
+    send(text) { this.body = text; return this; }
   };
   return res;
 }
@@ -33,16 +34,16 @@ function mockReq(options = {}) {
 async function runTests() {
   console.log("=== SPRINT 4 TELEGRAM WEBHOOK TEST SUITE STARTING ===");
 
-  // 1. Test api/telegram-launch.js deep link redirection
-  const launchHandler = require("../api/telegram-launch.js");
+  const webhookHandler = require("../api/telegram-webhook.js");
+
+  // 1. Test telegram-launch deep link redirection (handled by telegram-webhook.js)
   let res = mockRes();
-  await launchHandler(mockReq({ method: "GET", query: { store: "safari-kids" } }), res);
+  await webhookHandler(mockReq({ method: "GET", query: { launch: "1", store: "safari-kids" } }), res);
   assert.strictEqual(res.statusCode, 302, "Should redirect 302");
   assert(res.redirectUrl.includes("startapp=safari-kids"), "Should deep link to safari-kids");
-  console.log("✅ api/telegram-launch.js deep linking confirmed:", res.redirectUrl);
+  console.log("✅ Telegram launch deep linking confirmed:", res.redirectUrl);
 
   // 2. Test api/telegram-webhook.js GET info
-  const webhookHandler = require("../api/telegram-webhook.js");
   res = mockRes();
   await webhookHandler(mockReq({ method: "GET" }), res);
   assert.strictEqual(res.statusCode, 200, "Webhook GET info should return 200");

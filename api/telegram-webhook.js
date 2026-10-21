@@ -10,6 +10,21 @@ module.exports = async function handler(req, res) {
   if (req.method === "GET") {
     res.setHeader("Cache-Control", "no-store");
 
+    // Mini App Launch redirect: ?launch=1 yoki /api/telegram-launch
+    if (req.query.launch === "1" || (req.url && req.url.includes("telegram-launch"))) {
+      const username = String(process.env.TELEGRAM_BOT_USERNAME || "").replace(/^@/, "");
+      if (!/^[A-Za-z0-9_]{5,32}$/.test(username)) {
+        return res.status(503).send("Telegram Mini App link is not configured yet.");
+      }
+      const store = String(req.query.store || req.query.store_id || "").toLowerCase().replace(/[^a-z0-9-]/g, "").slice(0, 64);
+      const targetUrl = store 
+        ? `https://t.me/${encodeURIComponent(username)}?startapp=${encodeURIComponent(store)}`
+        : `https://t.me/${encodeURIComponent(username)}?startapp`;
+      res.setHeader("Cache-Control", "no-store");
+      res.setHeader("Referrer-Policy", "no-referrer");
+      return res.redirect(302, targetUrl);
+    }
+
     if (!TELEGRAM_BOT_TOKEN) {
       return res.status(503).json({ error: "telegram_bot_token_not_configured" });
     }
