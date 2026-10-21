@@ -67,15 +67,56 @@ const TEXT = {
 };
 
 function resolveStoreSlug() {
+  const sanitize = (val) => String(val || "").trim().toLowerCase().replace(/[^a-z0-9_-]/g, "");
+
+  // 1. Telegram WebApp SDK start_param
   const tgParam = window.Telegram?.WebApp?.initDataUnsafe?.start_param;
-  if (tgParam && typeof tgParam === "string" && tgParam.trim()) return tgParam.trim().toLowerCase();
-  const urlParam = new URLSearchParams(window.location.search).get("store");
-  if (urlParam && urlParam.trim()) return urlParam.trim().toLowerCase();
-  const host = window.location.hostname.toLowerCase();
-  if (host && !["localhost", "127.0.0.1"].includes(host)) {
-    const parts = host.split(".");
-    if (parts.length >= 3 && parts[0] !== "www" && !host.endsWith(".vercel.app")) return parts[0];
-  }
+  if (tgParam && sanitize(tgParam)) return sanitize(tgParam);
+
+  // 2. Telegram initData raw string (query_id=...&start_param=shahnoza&...)
+  try {
+    const rawInit = window.Telegram?.WebApp?.initData;
+    if (rawInit) {
+      const p = new URLSearchParams(rawInit).get("start_param");
+      if (p && sanitize(p)) return sanitize(p);
+    }
+  } catch {}
+
+  // 3. Telegram location.hash (e.g. #tgWebAppData=...&tgWebAppStartParam=shahnoza)
+  try {
+    const hash = window.location.hash.replace(/^#/, "");
+    if (hash) {
+      const hashParams = new URLSearchParams(hash);
+      const hashStart = hashParams.get("tgWebAppStartParam") || hashParams.get("start_param") || hashParams.get("startapp") || hashParams.get("store");
+      if (hashStart && sanitize(hashStart)) return sanitize(hashStart);
+
+      const innerData = hashParams.get("tgWebAppData");
+      if (innerData) {
+        const innerParams = new URLSearchParams(innerData);
+        const innerStart = innerParams.get("start_param");
+        if (innerStart && sanitize(innerStart)) return sanitize(innerStart);
+      }
+    }
+  } catch {}
+
+  // 4. URL query params (?store=..., ?startapp=..., ?tgWebAppStartParam=..., ?start_param=...)
+  try {
+    const searchParams = new URLSearchParams(window.location.search);
+    const qParam = searchParams.get("store") || searchParams.get("startapp") || searchParams.get("tgWebAppStartParam") || searchParams.get("start_param");
+    if (qParam && sanitize(qParam)) return sanitize(qParam);
+  } catch {}
+
+  // 5. Subdomain check (e.g. shahnoza.kids-shop.uz)
+  try {
+    const host = window.location.hostname.toLowerCase();
+    if (host && !["localhost", "127.0.0.1"].includes(host)) {
+      const parts = host.split(".");
+      if (parts.length >= 3 && parts[0] !== "www" && !host.endsWith(".vercel.app")) {
+        return sanitize(parts[0]);
+      }
+    }
+  } catch {}
+
   return "kids-shop";
 }
 const currentStoreSlug = resolveStoreSlug();
@@ -162,10 +203,26 @@ function productCard(p){
 
 function renderProducts(){
   $("#productTotal").textContent=String(PRODUCTS.length).padStart(2,"0");
+  const heroCount = $("#heroProofCount");
+  if (heroCount) heroCount.textContent = String(PRODUCTS.length).padStart(2, "0");
   const products=visibleProducts();
   $("#productGrid").innerHTML=products.map(productCard).join("");
   $("#productGrid").classList.toggle("hidden",!products.length);
   $("#emptyState").classList.toggle("hidden",!!products.length);
+
+  const emptyTitle = $("#emptyState h3");
+  const emptyText = $("#emptyState p");
+  const resetBtn = $("#resetFilters");
+
+  if (!PRODUCTS.length) {
+    if (emptyTitle) emptyTitle.textContent = state.lang === "ru" ? "В этом магазине пока нет товаров" : "Bu do‘konda hali mahsulotlar yo‘q";
+    if (emptyText) emptyText.textContent = state.lang === "ru" ? "Товары скоро появятся. Загляните позже!" : "Mahsulotlar tez orada qo‘shiladi. Birozdan so‘ng kiring!";
+    if (resetBtn) resetBtn.style.display = "none";
+  } else if (!products.length) {
+    if (emptyTitle) emptyTitle.textContent = t("emptyTitle");
+    if (emptyText) emptyText.textContent = t("emptyText");
+    if (resetBtn) resetBtn.style.display = "";
+  }
 }
 
 function openDrawer(view="cart"){
@@ -646,7 +703,7 @@ fetch("/api/products?store=" + encodeURIComponent(currentStoreSlug)).then(r=>r.o
     state.customStore = data.store;
     applyStoreCustomization(data.store);
   }
-  if(Array.isArray(data.products)&&data.products.length){
+  if(data && Array.isArray(data.products)){
     PRODUCTS.splice(0,PRODUCTS.length,...data.products);
     renderProducts();
     if(state.customStore?.categories) {
@@ -663,6 +720,10 @@ function applyStoreCustomization(store) {
     document.title = store.name;
     const brandWords = document.querySelectorAll(".brand-word, .brand-name, .nav-logo");
     brandWords.forEach(el => { el.textContent = store.name; });
+    const brandMark = document.querySelector(".brand-mark");
+    if (brandMark && store.id !== "kids-shop") {
+      brandMark.innerHTML = esc(store.name.charAt(0).toLowerCase()) + "<span>•</span>";
+    }
     const footerBrand = document.querySelector(".footer-bottom span:first-child");
     if (footerBrand) footerBrand.textContent = "© 2026 " + store.name;
   }
