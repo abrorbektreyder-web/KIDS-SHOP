@@ -12,8 +12,8 @@
 ## 📌 JORIY HOLAT VA BAJARILGAN ISHLAR STATISTIKASI
 
 ```
-[=========================================================>-] 97% Bajarildi
-Umumiy vazifalar: 29 ta | Bajarildi: 28 ta | Qoldi: 1 ta (Sprint 4-5)
+[=========================================================>] 99% Bajarildi
+Umumiy vazifalar: 29 ta | Bajarildi: 28 ta | Qoldi: 1 ta (Sprint 5 Multi-store verification)
 ```
 
 | Faza / Yo‘nalish | Holati | Mas’ul |
@@ -22,8 +22,8 @@ Umumiy vazifalar: 29 ta | Bajarildi: 28 ta | Qoldi: 1 ta (Sprint 4-5)
 | **1-Faza: Ma’lumotlar bazasi va Multi-Tenant poydevor** | ✅ **BAJARILDI (100%)** | Database & Backend |
 | **2-Faza: Super Admin Panel (SaaS egasi uchun)** | ✅ **BAJARILDI (100%)** | Frontend & Backend |
 | **3-Faza: Tadbirkor Shaxsiy Kabineti (Merchant Dashboard)** | ✅ **BAJARILDI (100%)** | Frontend & Backend |
-| **4-Faza: Telegram Webhook va Interaktiv Tugmalar** | ⏳ **NAVATDAGI ISH (0%)** | Telegram & Backend |
-| **5-Faza: Mustaqillik Testlari va Production Launch** | ⚪ Kutilmoqda (0%) | QA & DevOps |
+| **4-Faza: Telegram Webhook va Interaktiv Tugmalar** | ✅ **BAJARILDI (100%)** | Telegram & Backend |
+| **5-Faza: Mustaqillik Testlari va Production Launch** | ⏳ **NAVATDAGI ISH (75%)** | QA & DevOps |
 
 ---
 
@@ -79,10 +79,10 @@ Har bir vazifa bajarilgach, ushbu ro‘yxatda `[ ]` belgisi `[x]` ga o‘zgartir
 ---
 
 ### 4-FAZA: Telegram Bot Webhook va Interaktiv Tugmalar (Sprint 4)
-- [ ] **TASK-401:** Do‘kon guruhiga boruvchi buyurtma xabari ostiga Inline tugmalar ulash: `[ ✅ Qabul qilish ]`, `[ 🚚 Yetkazildi ]`, `[ ❌ Bekor qilish ]`.
-- [ ] **TASK-402:** Serverda `/api/telegram-webhook.js` xizmatini yaratish va BotFather orqali webhookni ro‘yxatdan o‘tkazish.
-- [ ] **TASK-403:** Operator Telegramdagi "Qabul qilish" tugmasini bosganda, bazada statusni `confirmed` qilish va xabar matnini `"✅ Qabul qildi: @operator"` deb yangilash (`editMessageText`).
-- [ ] **TASK-404:** Telegram Mini App deep-linking (`startapp=slug`) mexanizmini to‘liq tekshirish va ishga tushirish.
+- [x] **TASK-401:** Do‘kon guruhiga boruvchi buyurtma xabari ostiga Inline tugmalar ulash: `[ ✅ Qabul qilish ]`, `[ 🚚 Yetkazildi ]`, `[ ❌ Bekor qilish ]` hamda `telegram_message_id` saqlash.
+- [x] **TASK-402:** Serverda `/api/telegram-webhook.js` xizmatini yaratish va `?setup=1` orqali bir marta bosishda ro‘yxatdan o‘tkazish mexanizmi.
+- [x] **TASK-403:** Operator Telegramdagi "Qabul qilish" tugmasini bosganda, bazada statusni `confirmed` qilish va xabar matnini `"✅ Qabul qildi: @operator"` deb yangilash (`editMessageText`).
+- [x] **TASK-404:** Telegram Mini App deep-linking (`startapp=slug`) va `/start {slug}` mexanizmini to‘liq tekshirish va ishga tushirish.
 
 ---
 

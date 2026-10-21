@@ -135,6 +135,18 @@ module.exports = async function handler(req, res) {
       payload.customer.comment ? `\n💬 ${escapeHtml(payload.customer.comment)}` : "",
     ].filter(Boolean).join("\n");
 
+    const inlineKeyboard = {
+      inline_keyboard: [
+        [
+          { text: "✅ Qabul qilish", callback_data: `order:confirm:${orderId}` }
+        ],
+        [
+          { text: "🚚 Yetkazildi", callback_data: `order:sent:${orderId}` },
+          { text: "❌ Bekor qilish", callback_data: `order:cancel:${orderId}` }
+        ]
+      ]
+    };
+
     let notified = false;
     if (botToken && targetChatId) {
       try {
@@ -146,10 +158,19 @@ module.exports = async function handler(req, res) {
             text: report,
             parse_mode: "HTML",
             disable_web_page_preview: true,
+            reply_markup: inlineKeyboard,
           }),
         });
         const tgResult = await sendResponse.json().catch(() => null);
         notified = Boolean(sendResponse.ok && tgResult?.ok);
+
+        if (notified && tgResult?.result?.message_id) {
+          fetch(new URL(`/rest/v1/orders?id=eq.${encodeURIComponent(orderId)}`, url), {
+            method: "PATCH",
+            headers: supabaseHeaders(key, { "Content-Type": "application/json" }),
+            body: JSON.stringify({ telegram_message_id: String(tgResult.result.message_id) }),
+          }).catch(() => {});
+        }
       } catch (tgErr) {
         console.error("order_telegram_delivery_error", tgErr.message);
       }

@@ -9,7 +9,12 @@ module.exports = async function handler(req, res) {
     return res.status(503).send("Telegram Mini App link is not configured yet.");
   }
 
+  const store = String(req.query.store || req.query.store_id || "").toLowerCase().replace(/[^a-z0-9-]/g, "").slice(0, 64);
+  const targetUrl = store 
+    ? `https://t.me/${encodeURIComponent(username)}?startapp=${encodeURIComponent(store)}`
+    : `https://t.me/${encodeURIComponent(username)}?startapp`;
+
   res.setHeader("Cache-Control", "no-store");
   res.setHeader("Referrer-Policy", "no-referrer");
-  return res.redirect(302, `https://t.me/${encodeURIComponent(username)}?startapp`);
+  return res.redirect(302, targetUrl);
 };
