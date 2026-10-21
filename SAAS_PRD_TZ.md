@@ -12,15 +12,15 @@
 ## 📌 JORIY HOLAT VA BAJARILGAN ISHLAR STATISTIKASI
 
 ```
-[====================>----------------------------------------] 18% Bajarildi
-Umumiy vazifalar: 28 ta | Bajarildi: 5 ta | Qoldi: 23 ta
+[========================================>--------------------] 43% Bajarildi
+Umumiy vazifalar: 28 ta | Bajarildi: 12 ta | Qoldi: 16 ta
 ```
 
 | Faza / Yo‘nalish | Holati | Mas’ul |
 |---|---|---|
 | **0-Faza: Audit va Vitrina tuzatishlari** | ✅ **BAJARILDI (100%)** | Fullstack Dev |
-| **1-Faza: Ma’lumotlar bazasi va Multi-Tenant poydevor** | ⏳ **NAVATDAGI ISH (0%)** | Database & Backend |
-| **2-Faza: Super Admin Panel (SaaS egasi uchun)** | ⚪ Kutilmoqda (0%) | Frontend & Backend |
+| **1-Faza: Ma’lumotlar bazasi va Multi-Tenant poydevor** | ✅ **BAJARILDI (100%)** | Database & Backend |
+| **2-Faza: Super Admin Panel (SaaS egasi uchun)** | ⏳ **NAVATDAGI ISH (0%)** | Frontend & Backend |
 | **3-Faza: Tadbirkor Shaxsiy Kabineti (Merchant Dashboard)** | ⚪ Kutilmoqda (0%) | Frontend & Backend |
 | **4-Faza: Telegram Webhook va Interaktiv Tugmalar** | ⚪ Kutilmoqda (0%) | Telegram & Backend |
 | **5-Faza: Mustaqillik Testlari va Production Launch** | ⚪ Kutilmoqda (0%) | QA & DevOps |
@@ -41,13 +41,13 @@ Har bir vazifa bajarilgach, ushbu ro‘yxatda `[ ]` belgisi `[x]` ga o‘zgartir
 ---
 
 ### 1-FAZA: Ma’lumotlar bazasi va Multi-Tenant Poydevor (Sprint 1)
-- [ ] **TASK-101:** Supabase PostgreSQL’da `public.stores` (do‘konlar) jadvalini yaratish (ID/slug, nom, telefon, parol, Telegram chat ID, muddat).
-- [ ] **TASK-102:** `public.products`, `public.orders`, `public.order_items`, `public.subscribers` jadvallariga `store_id` ustunini va Foreign Key bog‘lanishlarini qo‘shish.
-- [ ] **TASK-103:** Tranzaksion `place_order` SQL funksiyasini `store_id` bo‘yicha tovar zaxirasini tekshiradigan va buyurtmani tegishli do‘konga yozadigan qilib yangilash.
-- [ ] **TASK-104:** 1000+ do‘konda qotmasligi uchun bazada `store_id` ustunlariga B-Tree indekslarini o‘rnatish.
-- [ ] **TASK-105:** `vercel.json`dagi `X-Frame-Options: DENY`ni olib tashlab, Telegram Mini App uchun to‘g‘ri CSP (`frame-ancestors`) o‘rnatish.
-- [ ] **TASK-106:** `GET /api/products` API sini `?store=...` so‘rovi bo‘yicha faqat o‘sha do‘kon tovarlarini filtrlaydigan qilish.
-- [ ] **TASK-107:** `POST /api/orders` API sini kelgan `store_id` orqali bazadan o‘sha do‘konning `telegram_chat_id` sini olib, buyurtmani aynan o‘sha guruhga yo‘naltiradigan qilish.
+- [x] **TASK-101:** Supabase PostgreSQL’da `public.stores` (do‘konlar) jadvalini yaratish (ID/slug, nom, telefon, parol, Telegram chat ID, muddat).
+- [x] **TASK-102:** `public.products`, `public.orders`, `public.order_items`, `public.subscribers` jadvallariga `store_id` ustunini va Foreign Key bog‘lanishlarini qo‘shish.
+- [x] **TASK-103:** Tranzaksion `place_order` SQL funksiyasini `store_id` bo‘yicha tovar zaxirasini tekshiradigan va buyurtmani tegishli do‘konga yozadigan qilib yangilash.
+- [x] **TASK-104:** 1000+ do‘konda qotmasligi uchun bazada `store_id` ustunlariga B-Tree indekslarini o‘rnatish.
+- [x] **TASK-105:** `vercel.json`dagi `X-Frame-Options: DENY`ni olib tashlab, Telegram Mini App uchun to‘g‘ri CSP (`frame-ancestors`) o‘rnatish.
+- [x] **TASK-106:** `GET /api/products` API sini `?store=...` so‘rovi bo‘yicha faqat o‘sha do‘kon tovarlarini filtrlaydigan qilish.
+- [x] **TASK-107:** `POST /api/orders` API sini kelgan `store_id` orqali bazadan o‘sha do‘konning `telegram_chat_id` sini olib, buyurtmani aynan o‘sha guruhga yo‘naltiradigan qilish.
 
 ---
 

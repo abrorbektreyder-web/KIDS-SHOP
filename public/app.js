@@ -66,6 +66,20 @@ const TEXT = {
   ru:{announcement:"Новая коллекция KIDS-SHOP 2026",details:"Подробнее",skip:"Перейти к содержимому",navNew:"Новинки",navBoys:"Для мальчиков",navGirls:"Для девочек",navAbout:"О нас",heroEyebrow:"НОВЫЙ СЕЗОН 2026",heroTitle:'Маленькие шаги,<br /><em>большие</em> приключения.',heroText:"Удобная одежда на каждый день и незабываемое детство. Пусть малышу будет свободно двигаться и легко быть собой.",shopNow:"Начать покупки",ourStory:"Наша история",happyFamilies:"Одежда нового сезона",happyFamiliesSub:"для вашего малыша",benefit1:"Мягкие ткани",benefit1sub:"Для нежной кожи",benefit2:"Свобода движений",benefit2sub:"Комфорт весь день",benefit3:"Проверенное качество",benefit3sub:"Выбор родителей",benefit4:"Яркий дизайн",benefit4sub:"Настроение каждый день",collectionEyebrow:"ВЫБОР KIDS-SHOP",collectionTitle:'Находки для <em>малышей</em>',viewAll:"Смотреть все",filterAll:"Все товары",filterBoys:"Для мальчиков",filterGirls:"Для девочек",filterSets:"Комплекты",filterSale:"Скидки",searchPlaceholder:"Поиск товаров",sortFeatured:"Рекомендуем",sortLow:"Сначала дешевле",sortHigh:"Сначала дороже",addQuick:"Выбрать",age:"Возраст",soldOut:"Нет в наличии",emptyTitle:"Ничего не найдено",emptyText:"Попробуйте другой запрос.",resetFilters:"Сбросить фильтры",bannerEyebrow:"ДЕТСТВО — ЛУЧШЕЕ ПРИКЛЮЧЕНИЕ",bannerTitle:'Каждый день —<br /><em>новая история.</em>',bannerText:"Одежда для игр, прогулок и открытий. KIDS-SHOP рядом в каждый момент детства.",findLook:"Найти свой стиль",storyEyebrow:"МАЛЕНЬКИЕ РАДОСТИ",storyTitle:'Они маленькие.<br />Их мечты <em>большие.</em>',storyText:"В KIDS-SHOP детская одежда — это не только красивый вид. Каждая ткань и каждый шов выбраны с заботой о комфорте и качестве. Ведь лучший стиль — чувствовать себя счастливым.",learnMore:"Узнать нас ближе",stat1:"новый сезон",stat2:"языка сайта",stat3:"товаров в каталоге",newsletterEyebrow:"KIDS CLUB",newsletterTitle:'Хорошие новости,<br /><em>маленькие шаги.</em>',newsletterText:"Узнавайте о новых коллекциях и приятных предложениях первыми.",phoneLabel:"Ваш номер телефона",newsletterDisclaimer:"Подписываясь, вы принимаете нашу политику конфиденциальности.",deliveryTitle:"Доставляем по всему Узбекистану",deliveryText:"Срок доставки уточнит оператор",returnsTitle:"Условия обмена",returnsText:"Для обмена напишите оператору",supportTitle:"Мы готовы помочь",supportText:"Связь через Telegram",footerText:"Большой комфорт для маленьких.<br />Раскрасим детство вместе.",footerShop:"Магазин",footerNew:"Новинки",footerBoys:"Для мальчиков",footerGirls:"Для девочек",footerSale:"Скидки",footerHelp:"Помощь",footerDelivery:"Доставка",footerReturns:"Обмен и возврат",footerSize:"Таблица размеров",footerContact:"Контакты",footerHours:"Связь через Telegram",footerRights:"С заботой о детстве.",privacy:"Политика конфиденциальности",bag:"Корзина",searchTitle:"Поиск",favoritesTitle:"Избранное",emptyFavorites:"Вы пока не добавили товары в избранное.",emptyCartTitle:"Ваша корзина пока пуста",emptyCartText:"Выберите одежду для вашего малыша.",continueShopping:"Продолжить покупки",yourChoice:"ВАШ ВЫБОР",cartTitle:"Корзина",orderTotal:"Итого",checkout:"Оформить заказ",deliveryNote:"Стоимость доставки зависит от адреса.",chooseSize:"Выберите размер и возраст",chooseColor:"Выберите цвет",colorLabel:"Цвет",selectSizeError:"Пожалуйста, выберите размер.",productDetail:"О ТОВАРЕ",addedToCart:"Товар добавлен в корзину",removedFavorite:"Удалено из избранного",addedFavorite:"Добавлено в избранное",checkoutTitle:"Данные заказа",name:"Ваше имя",phone:"Номер телефона",region:"Область",district:"Город / район",address:"Адрес доставки",addressHint:"Улица, дом, квартира",comment:"Комментарий (необязательно)",payment:"Способ оплаты",payCod:"Оплата при получении",payTransfer:"Картой (подтвердит оператор)",placeOrder:"Отправить заказ",backCart:"← Вернуться в корзину",requiredError:"Пожалуйста, заполните обязательные поля.",networkError:"Не удалось отправить заказ. Попробуйте снова.",orderSuccess:"Ваш заказ принят!",orderThanks:"Наш оператор скоро свяжется с вами. Номер заказа:",close:"Закрыть",orderReceipt:"Заказ",addedNewsletter:"Спасибо за доверие! Вы будете одними из первых узнавать о новых коллекциях и предложениях.",newsletterSubmitError:"Не удалось оформить подписку. Попробуйте ещё раз чуть позже.",newsletterError:"Введите корректный номер телефона.",newLabel:"НОВИНКА",hitLabel:"ХИТ",sizeLabel:"Размер",qtyLabel:"Кол-во",searchNoResults:"Подходящие товары не найдены.",telegramHint:"Заказ из Telegram Mini App также отправит уведомление в группу и оператору."}
 };
 
+function resolveStoreSlug() {
+  const tgParam = window.Telegram?.WebApp?.initDataUnsafe?.start_param;
+  if (tgParam && typeof tgParam === "string" && tgParam.trim()) return tgParam.trim().toLowerCase();
+  const urlParam = new URLSearchParams(window.location.search).get("store");
+  if (urlParam && urlParam.trim()) return urlParam.trim().toLowerCase();
+  const host = window.location.hostname.toLowerCase();
+  if (host && !["localhost", "127.0.0.1"].includes(host)) {
+    const parts = host.split(".");
+    if (parts.length >= 3 && parts[0] !== "www" && !host.endsWith(".vercel.app")) return parts[0];
+  }
+  return "kids-shop";
+}
+const currentStoreSlug = resolveStoreSlug();
+
 function readArray(key){try{const value=JSON.parse(localStorage.getItem(key)||"[]");return Array.isArray(value)?value:[]}catch{return []}}
 const storedCart=readArray("kids-cart");
 const state={
@@ -392,7 +406,7 @@ async function submitOrder(form){
   const data=Object.fromEntries(new FormData(form).entries());
   const total=state.cart.reduce((sum,row)=>sum+(PRODUCTS.find(p=>p.id===row.id)?.price||0)*row.qty,0);
   const payload={
-    customer:{name:data.name,phone:data.phone,region:data.region,district:data.district,address:data.address,comment:data.comment||""},
+    storeId:currentStoreSlug,customer:{name:data.name,phone:data.phone,region:data.region,district:data.district,address:data.address,comment:data.comment||""},
     payment:"cod",
     lang:state.lang,
     currency:"UZS",
@@ -590,7 +604,7 @@ document.addEventListener("submit",e=>{
     fetch("/api/subscribe",{
       method:"POST",
       headers:{"content-type":"application/json"},
-      body:JSON.stringify({phone,lang:state.lang})
+      body:JSON.stringify({phone,lang:state.lang,storeId:currentStoreSlug})
     }).then(async r=>{
       const data=await r.json();
       if(!r.ok)throw new Error(data.error||"subscribe_failed");
@@ -625,7 +639,17 @@ persist();
 setLanguage(state.lang);
 renderProducts();
 
-fetch("/api/products").then(r=>r.ok?r.json():Promise.reject()).then(data=>{
+fetch("/api/products?store=" + encodeURIComponent(currentStoreSlug)).then(r=>r.ok?r.json():Promise.reject()).then(data=>{
+  if(data&&data.store){
+    if(data.store.name){
+      document.title=data.store.name;
+      const brandLogo=document.querySelector(".brand-name")||document.querySelector(".nav-logo");
+      if(brandLogo)brandLogo.textContent=data.store.name;
+    }
+    if(data.store.theme_color){
+      document.documentElement.style.setProperty("--color-brand",data.store.theme_color);
+    }
+  }
   if(Array.isArray(data.products)&&data.products.length){
     PRODUCTS.splice(0,PRODUCTS.length,...data.products);
     renderProducts();

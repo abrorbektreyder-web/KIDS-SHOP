@@ -8,22 +8,76 @@ const demo = [
   ["sunny-day-set","Sunny Day qulay set","Комплект Sunny Day","boys","sets",269000,319000,"2–7 yosh",["#f3d34d","#2c61d6","#ede9df"],"/images/product-mustard-vest.webp","−16%","Yumshoq paxta • faol bolalar uchun","Мягкий хлопок • для активных детей",["2–3 yosh","3–4 yosh","5–6 yosh","7–8 yosh"]],
   ["weekend-dress","Weekend mini libos","Платье Weekend mini","girls","tops",199000,null,"2–7 yosh",["#aabd84","#e2c9a0","#eeb7a5"],"/images/product-green-girl.webp","HIT","Har bir kun — kichik bayram","Каждый день — маленький праздник",["2–3 yosh","3–4 yosh","5–6 yosh","7–8 yosh"]]
 ].map(([id,uz,ru,category,type,price,oldPrice,age,colors,image,badge,uzTag,ruTag,sizes])=>({id,name:{uz,ru},category,type,price,oldPrice,age,colors,image,badge,tagline:{uz:uzTag,ru:ruTag},sizes,stock:10}));
-const {getSupabaseConfig,supabaseHeaders}=require("./_supabase");
 
-module.exports = async function handler(req,res){
-  res.setHeader("Cache-Control","s-maxage=60, stale-while-revalidate=300");
-  if(req.method!=="GET"){res.setHeader("Allow","GET");return res.status(405).json({error:"method_not_allowed"});}
-  const {url,key}=getSupabaseConfig();
-  if(!url||!key)return res.status(200).json({products:demo,source:"demo"});
-  try{
-    const endpoint=new URL("/rest/v1/products?active=eq.true&select=*&order=created_at.desc",url);
-    const result=await fetch(endpoint,{headers:supabaseHeaders(key)});
-    if(!result.ok)throw new Error("catalog_unavailable");
-    const rows=await result.json();
-    const imageCounts=new Map();
-    for(const product of rows)imageCounts.set(product.image_url,(imageCounts.get(product.image_url)||0)+1);
-    const demoById=new Map(demo.map(product=>[product.id,product]));
-    const products=rows.map(p=>({id:p.id,name:{uz:p.name_uz,ru:p.name_ru},category:p.category,type:p.type,price:p.price,oldPrice:p.old_price,age:p.age,colors:p.colors,image:imageCounts.get(p.image_url)>1?(demoById.get(p.id)?.image||p.image_url):p.image_url,badge:p.badge,tagline:{uz:p.tagline_uz,ru:p.tagline_ru},sizes:p.sizes,stock:p.stock}));
-    return res.status(200).json({products,source:"database"});
-  }catch{return res.status(503).json({error:"catalog_temporarily_unavailable"});}
+const { getSupabaseConfig, supabaseHeaders } = require("./_supabase");
+
+module.exports = async function handler(req, res) {
+  res.setHeader("Cache-Control", "s-maxage=60, stale-while-revalidate=300");
+  if (req.method !== "GET") {
+    res.setHeader("Allow", "GET");
+    return res.status(405).json({ error: "method_not_allowed" });
+  }
+
+  // Multi-tenant resolution: ?store=slug
+  const rawStore = req.query.store || req.query.store_id || "kids-shop";
+  const storeId = String(rawStore).toLowerCase().replace(/[^a-z0-9-]/g, "").slice(0, 64) || "kids-shop";
+
+  const { url, key } = getSupabaseConfig();
+  if (!url || !key) return res.status(200).json({ store: { id: "kids-shop", name: "KIDS-SHOP" }, products: demo, source: "demo" });
+
+  try {
+    // 1. Do'kon sozlamalari va holatini tekshirish
+    let storeInfo = { id: storeId, name: storeId === "kids-shop" ? "KIDS-SHOP" : storeId, status: "active" };
+    try {
+      const storeRes = await fetch(new URL(`/rest/v1/stores?id=eq.${encodeURIComponent(storeId)}&select=id,name,logo_url,theme_color,status,plan`, url), {
+        headers: supabaseHeaders(key),
+      });
+      if (storeRes.ok) {
+        const storeRows = await storeRes.json();
+        if (storeRows && storeRows.length) {
+          storeInfo = storeRows[0];
+          if (storeInfo.status !== "active") {
+            return res.status(403).json({ error: "store_suspended", store: storeInfo });
+          }
+        }
+      }
+    } catch {}
+
+    // 2. Ushbu do'kon tovarlarini yuklash (store_id bo'yicha)
+    let endpoint = new URL(`/rest/v1/products?store_id=eq.${encodeURIComponent(storeId)}&active=eq.true&select=*&order=created_at.desc`, url);
+    let result = await fetch(endpoint, { headers: supabaseHeaders(key) });
+
+    // Agar do'kon hali migratsiyadan o'tmagan bo'lsa (default fallback)
+    if (!result.ok && storeId === "kids-shop") {
+      endpoint = new URL("/rest/v1/products?active=eq.true&select=*&order=created_at.desc", url);
+      result = await fetch(endpoint, { headers: supabaseHeaders(key) });
+    }
+
+    if (!result.ok) throw new Error("catalog_unavailable");
+    const rows = await result.json();
+
+    const imageCounts = new Map();
+    for (const product of rows) imageCounts.set(product.image_url, (imageCounts.get(product.image_url) || 0) + 1);
+    const demoById = new Map(demo.map(product => [product.id, product]));
+    const products = rows.map(p => ({
+      id: p.id,
+      storeId: p.store_id || storeId,
+      name: { uz: p.name_uz, ru: p.name_ru },
+      category: p.category,
+      type: p.type,
+      price: p.price,
+      oldPrice: p.old_price,
+      age: p.age,
+      colors: p.colors || [],
+      image: imageCounts.get(p.image_url) > 1 ? (demoById.get(p.id)?.image || p.image_url) : p.image_url,
+      badge: p.badge,
+      tagline: { uz: p.tagline_uz, ru: p.tagline_ru },
+      sizes: p.sizes || [],
+      stock: p.stock
+    }));
+
+    return res.status(200).json({ store: storeInfo, products, source: "database" });
+  } catch {
+    return res.status(503).json({ error: "catalog_temporarily_unavailable" });
+  }
 };
