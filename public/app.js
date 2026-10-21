@@ -714,19 +714,19 @@ fetch("/api/products?store=" + encodeURIComponent(currentStoreSlug)).then(r=>r.o
 
 function applyStoreCustomization(store) {
   if (!store) return;
+  const isCustomTenant = store.id !== "kids-shop";
+  const storeDisplayName = store.name || store.id;
 
   // 1. Title & Branding
-  if (store.name) {
-    document.title = store.name;
-    const brandWords = document.querySelectorAll(".brand-word, .brand-name, .nav-logo");
-    brandWords.forEach(el => { el.textContent = store.name; });
-    const brandMark = document.querySelector(".brand-mark");
-    if (brandMark && store.id !== "kids-shop") {
-      brandMark.innerHTML = esc(store.name.charAt(0).toLowerCase()) + "<span>•</span>";
-    }
-    const footerBrand = document.querySelector(".footer-bottom span:first-child");
-    if (footerBrand) footerBrand.textContent = "© 2026 " + store.name;
+  document.title = storeDisplayName;
+  const brandWords = document.querySelectorAll(".brand-word, .brand-name, .nav-logo");
+  brandWords.forEach(el => { el.textContent = storeDisplayName; });
+  const brandMark = document.querySelector(".brand-mark");
+  if (brandMark && isCustomTenant) {
+    brandMark.innerHTML = esc(storeDisplayName.charAt(0).toUpperCase()) + "<span>•</span>";
   }
+  const footerBrand = document.querySelector(".footer-bottom span:first-child");
+  if (footerBrand) footerBrand.textContent = "© 2026 " + storeDisplayName;
 
   // 2. Theme Color
   if (store.theme_color) {
@@ -735,50 +735,74 @@ function applyStoreCustomization(store) {
   }
 
   // 3. Announcement Ticker
-  if (store.announcement_text) {
-    const announcementEl = document.querySelector(".announcement span[data-i18n='announcement']");
-    if (announcementEl) {
-      announcementEl.removeAttribute("data-i18n");
-      announcementEl.textContent = store.announcement_text;
-    }
+  const announcementEl = document.querySelector(".announcement span[data-i18n='announcement']");
+  if (announcementEl) {
+    announcementEl.removeAttribute("data-i18n");
+    announcementEl.textContent = store.announcement_text || (isCustomTenant ? (storeDisplayName + " onlayn do‘koniga xush kelibsiz!") : "Yangi kolleksiya — 2026");
   }
 
-  // 4. Hero Title (supports newlines)
-  if (store.hero_title) {
-    const heroTitleEl = document.querySelector("h1[data-i18n='heroTitle']");
-    if (heroTitleEl) {
-      heroTitleEl.removeAttribute("data-i18n");
+  // 4. Hero Title
+  const heroTitleEl = document.querySelector("h1[data-i18n='heroTitle']");
+  if (heroTitleEl) {
+    heroTitleEl.removeAttribute("data-i18n");
+    if (store.hero_title && (!isCustomTenant || !store.hero_title.includes("Kichik qadamlar"))) {
       heroTitleEl.innerHTML = esc(store.hero_title).replace(/\n/g, "<br />");
+    } else if (isCustomTenant) {
+      heroTitleEl.innerHTML = esc(storeDisplayName) + "<br /><em>Onlayn Do‘koni</em>";
     }
   }
 
   // 5. Hero Subtitle
-  if (store.hero_subtitle) {
-    const heroSubEl = document.querySelector("p[data-i18n='heroText']");
-    if (heroSubEl) {
-      heroSubEl.removeAttribute("data-i18n");
+  const heroSubEl = document.querySelector("p[data-i18n='heroText']");
+  if (heroSubEl) {
+    heroSubEl.removeAttribute("data-i18n");
+    if (store.hero_subtitle && (!isCustomTenant || !store.hero_subtitle.includes("Har kun uchun qulay, bolalik uchun"))) {
       heroSubEl.textContent = store.hero_subtitle;
+    } else if (isCustomTenant) {
+      heroSubEl.textContent = "Sifatli mahsulotlar va tezkor yetkazib berish xizmati. Bizning do‘kondan qulay xarid qiling!";
     }
   }
 
-  // 6. Hero Image
-  if (store.hero_image_url) {
+  // 6. Hero Eyebrow
+  const heroEyebrowEl = document.querySelector(".hero-copy .eyebrow span[data-i18n='heroEyebrow']");
+  if (heroEyebrowEl && isCustomTenant) {
+    heroEyebrowEl.removeAttribute("data-i18n");
+    heroEyebrowEl.textContent = storeDisplayName.toUpperCase() + " · 2026";
+  }
+
+  // 7. Collection Eyebrow & Title
+  const colEyebrow = document.querySelector(".section-heading span[data-i18n='collectionEyebrow']");
+  if (colEyebrow && isCustomTenant) {
+    colEyebrow.removeAttribute("data-i18n");
+    colEyebrow.textContent = storeDisplayName.toUpperCase() + " KATALOGI";
+  }
+  const colTitle = document.querySelector(".section-heading h2[data-i18n='collectionTitle']");
+  if (colTitle && isCustomTenant) {
+    colTitle.removeAttribute("data-i18n");
+    colTitle.innerHTML = "Siz uchun <em>eng sara mahsulotlar</em>";
+  }
+
+  // 8. Story section & Adventure banner for custom tenant
+  if (isCustomTenant) {
+    const storySection = document.getElementById("story");
+    if (storySection) storySection.style.display = "none";
+    const adventureBanner = document.querySelector(".adventure-banner");
+    if (adventureBanner) adventureBanner.style.display = "none";
+    const heroProofCopy = document.querySelector(".hero-proof .proof-copy strong");
+    if (heroProofCopy) heroProofCopy.textContent = storeDisplayName;
+    const heroProofSub = document.querySelector(".hero-proof .proof-copy small");
+    if (heroProofSub) heroProofSub.textContent = "Rasmiy do‘kon";
+  }
+
+  // 9. Hero Image
+  if (store.hero_image_url && (!isCustomTenant || !store.hero_image_url.includes("look-safari"))) {
     const heroImgEl = document.querySelector(".hero-photo img");
     if (heroImgEl) {
       heroImgEl.src = safeImage(store.hero_image_url);
     }
   }
 
-  // 7. Banner CTA Button Text
-  if (store.banner_cta_text) {
-    const heroBtnSpan = document.querySelector(".hero-buttons .button-dark span[data-i18n='shopNow']");
-    if (heroBtnSpan) {
-      heroBtnSpan.removeAttribute("data-i18n");
-      heroBtnSpan.textContent = store.banner_cta_text;
-    }
-  }
-
-  // 8. Contact Phone
+  // 10. Contact Phone
   if (store.contact_phone) {
     const phoneClean = store.contact_phone.replace(/[^0-9+]/g, "");
     const supportTextEl = document.querySelector("#delivery [data-i18n='supportText']");
@@ -788,8 +812,8 @@ function applyStoreCustomization(store) {
     }
   }
 
-  // 9. Telegram Links & Mini App
-  const tgMiniAppUrl = "https://t.me/kids_shbot?startapp=" + encodeURIComponent(currentStoreSlug);
+  // 11. Telegram Links & Mini App
+  const tgMiniAppUrl = "https://t.me/kids_shbot?startapp=" + encodeURIComponent(store.id);
   const tgContactUrl = store.contact_telegram 
     ? (store.contact_telegram.startsWith("http") ? store.contact_telegram : "https://t.me/" + store.contact_telegram.replace(/^@/, ""))
     : tgMiniAppUrl;
@@ -799,7 +823,7 @@ function applyStoreCustomization(store) {
     link.href = tgContactUrl;
   });
 
-  // 10. Custom Categories Filter Pills
+  // 12. Custom Categories Filter Pills
   if (Array.isArray(store.categories) && store.categories.length) {
     renderDynamicFilterPills(store.categories);
   }
