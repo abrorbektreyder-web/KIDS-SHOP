@@ -4,7 +4,21 @@
     "api/*.js": { "maxDuration": 10 }
   },
   "headers": [
-    { "source": "/(.*)", "headers": [ { "key": "X-Content-Type-Options", "value": "nosniff" }, { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" }, { "key": "X-Frame-Options", "value": "DENY" }, { "key": "Strict-Transport-Security", "value": "max-age=31536000" }, { "key": "Permissions-Policy", "value": "camera=(), microphone=(), geolocation=()" } ] },
-    { "source": "/images/(.*)", "headers": [ { "key": "Cache-Control", "value": "public, max-age=31536000, immutable" } ] }
+    {
+      "source": "/(.*)",
+      "headers": [
+        { "key": "X-Content-Type-Options", "value": "nosniff" },
+        { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" },
+        { "key": "Content-Security-Policy", "value": "frame-ancestors 'self' https://web.telegram.org https://*.telegram.org https://webk.telegram.org https://webz.telegram.org;" },
+        { "key": "Strict-Transport-Security", "value": "max-age=31536000" },
+        { "key": "Permissions-Policy", "value": "camera=(), microphone=(), geolocation=()" }
+      ]
+    },
+    {
+      "source": "/images/(.*)",
+      "headers": [
+        { "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }
+      ]
+    }
   ]
 }
